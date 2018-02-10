@@ -29,20 +29,20 @@ import android.widget.Toast;
  */
 public class ExampleSceneLoader extends SceneLoader {
 
-	public Object3DData bodyHands = null;
-	public Object3DData getBodyHands()
+	public Object3DData bodyRightHand = null;
+	public Object3DData getBodyRightHand()
 	{
-		return bodyHands;
+		return bodyRightHand;
 	}
-	public void setBodyHands(float[] bodyHandsLines)
+	public void setBodyRightHand(float[] bodyRightHandLines)
 	{
-		bodyHands = Object3DBuilder.buildLine(bodyHandsLines);
+		bodyRightHand = Object3DBuilder.buildLine(bodyRightHandLines);
 		return;
 	}
-	public float[] overwriteBodyHands = null;
-	public void setOverwriteBodyHands(float[] overwriteBodyHandsLines)
+	public float[] overwriteBodyRightHand = null;
+	public void setOverwriteBodyRightHand(float[] overwriteBodyRightHandLines)
 	{
-		overwriteBodyHands = overwriteBodyHandsLines;
+        overwriteBodyRightHand = overwriteBodyRightHandLines;
 	}
 
 
@@ -68,20 +68,26 @@ public class ExampleSceneLoader extends SceneLoader {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					if(overwriteBodyHands == null){
-						bodyHands = Object3DBuilder.buildLine(
-								new float[] {
-										0.0f, 1.5f, 0.5f, -0.1f, 1.15f, 0.5f,
-										-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, 0.5f,
-										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
-										0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
-								});
+					if(overwriteBodyRightHand == null){
+						bodyRightHand = Object3DBuilder.buildLine(
+							new float[] {
+								0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+								0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
+							});
 					} else {
-						bodyHands = Object3DBuilder.buildLine(overwriteBodyHands);
+						bodyRightHand = Object3DBuilder.buildLine(overwriteBodyRightHand);
 					}
+					bodyRightHand.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyRightHand);
 
-					bodyHands.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-					addObject(bodyHands);
+					Object3DData bodyLeftHand = Object3DBuilder.buildLine(
+						new float[] {
+							0.0f, 1.5f, 0.5f, -0.1f, 1.15f, 0.5f,
+							-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, 0.5f
+						});
+
+					bodyLeftHand.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyLeftHand);
 
 					// 3D Axis
 					Object3DData axis = Object3DBuilder.buildAxis().setId("axis");

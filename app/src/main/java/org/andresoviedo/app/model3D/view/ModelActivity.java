@@ -98,43 +98,22 @@ public class ModelActivity extends Activity {
 
 		scene.init();
 
-//if(scene.getBodyHands() != null)
-		{
+		final Handler handlerTimer = new Handler();
+		final int delay = 1000; //milliseconds
+		handlerTimer.postDelayed(new Runnable(){
+			public void run(){
+				scene.replaceObject(0,
+					Object3DBuilder.buildLine(
+						new float[] {
+							0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+							0.1f, 1.15f, 0.5f, 0.1f, 0.75f, new Random().nextFloat()
+						}
+					).setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f })
+				);
 
-			final Handler handlerTimer = new Handler();
-			final int delay = 1000; //milliseconds
-			final float countMove = 0.05f;
-			handlerTimer.postDelayed(new Runnable(){
-				public void run(){
-					//do something
-					scene.replaceObject(0,
-							//countMove = countMove + 0.05f;
-							Object3DBuilder.buildLine(
-									new float[] {
-											-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, new Random().nextFloat()
-									}
-							).setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f })
-					);
-
-					handlerTimer.postDelayed(this, delay);
-				}
-			}, delay);
-
-
-
-	/*scene.setOverwriteBodyHands(
-			new float[] {
-					0.0f, 1.5f, 0.25f, -0.1f, 1.15f, 0.25f//,
-					//-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, 0.5f,
-					//0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
-					//0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
+				handlerTimer.postDelayed(this, delay);
 			}
-	);
-	scene.init();*/
-			//scene.setBodyHands();
-			//Log.i("ivan getBodyHands:", scene.getBodyHands().toString());
-		}
-
+		}, delay);
 
 		// Show the Up button in the action bar.
 		setupActionBar();

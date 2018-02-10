@@ -31,18 +31,18 @@ import android.widget.Toast;
  */
 public class SceneLoader {
 
-	public Object3DData getBodyHands()
+	public Object3DData getBodyRightHand()
 	{
 		return null;
 	}
-	public void setBodyHands(float[] bodyHandsLines)
+	public void setBodyRightHand(float[] bodyRightHandLines)
 	{
 		return;
 	}
-	public float[] overwriteBodyHands = null;
-	public void setOverwriteBodyHands(float[] overwriteBodyHandsLines)
+	public float[] overwriteBodyRightHand = null;
+	public void setOverwriteBodyRightHand(float[] overwriteBodyRightHandLines)
 	{
-		overwriteBodyHands = overwriteBodyHandsLines;
+		overwriteBodyRightHand = overwriteBodyRightHandLines;
 	}
 
 	/**
