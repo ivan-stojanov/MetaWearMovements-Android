@@ -15,9 +15,9 @@ import android.util.Log;
 
 /**
  * Abstract class that implements all calls to opengl to draw objects
- * 
+ *
  * Subclasses must provide vertex shader and specify whether the shaders supports specific features
- * 
+ *
  * @author andresoviedo
  *
  */
@@ -52,7 +52,7 @@ public abstract class Object3DImpl implements Object3D {
 
 	@Override
 	public void draw(Object3DData obj, float[] pMatrix, float[] vMatrix, int drawMode, int drawSize, int textureId,
-			float[] lightPos) {
+					 float[] lightPos) {
 
 		// Log.d("Object3DImpl", "Drawing '" + obj.getId() + "' using shader '" + id + "'...");
 
@@ -347,7 +347,7 @@ public abstract class Object3DImpl implements Object3D {
 			} else {
 				if (drawSize <= 0) {
 					int drawCount = vertexBuffer.capacity() / COORDS_PER_VERTEX;
-					
+
 					// if we want to animate, initialize counter=0 at variable declaration
 					if (this.shift >= 0) {
 						double rotation = ((SystemClock.uptimeMillis() % 10000) / 10000f) * (Math.PI * 2);
@@ -372,7 +372,7 @@ public abstract class Object3DImpl implements Object3D {
 
 /**
  * Draw using single color
- * 
+ *
  * @author andresoviedo
  *
  */
@@ -380,21 +380,21 @@ class Object3DV1 extends Object3DImpl {
 
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;" + 
-		"attribute vec4 a_Position;" + 
-		"void main() {" +
-			"  gl_Position = u_MVPMatrix * a_Position;\n" +
-			"  gl_PointSize = 20.0;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;" +
+					"attribute vec4 a_Position;" +
+					"void main() {" +
+					"  gl_Position = u_MVPMatrix * a_Position;\n" +
+					"  gl_PointSize = 20.0;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	private final static String fragmentShaderCode = 
-		"precision mediump float;"+ 
-		"uniform vec4 vColor;" + 
-		"void main() {"+ 
-		"  gl_FragColor = vColor;" + 
-		"}";
+	private final static String fragmentShaderCode =
+			"precision mediump float;"+
+					"uniform vec4 vColor;" +
+					"void main() {"+
+					"  gl_FragColor = vColor;" +
+					"}";
 	// @formatter:on
 
 	public Object3DV1() {
@@ -409,31 +409,31 @@ class Object3DV1 extends Object3DImpl {
 
 /**
  * Drawer using multiple colors
- * 
+ *
  * @author andresoviedo
  *
  */
 class Object3DV2 extends Object3DImpl {
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;" + 
-		"attribute vec4 a_Position;" +
-		"attribute vec4 a_Color;"+
-		"varying vec4 vColor;"+
-		"void main() {" +
-			"  vColor = a_Color;"+
-			"  gl_Position = u_MVPMatrix * a_Position;" +
-			"  gl_PointSize = 2.5;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;" +
+					"attribute vec4 a_Position;" +
+					"attribute vec4 a_Color;"+
+					"varying vec4 vColor;"+
+					"void main() {" +
+					"  vColor = a_Color;"+
+					"  gl_Position = u_MVPMatrix * a_Position;" +
+					"  gl_PointSize = 2.5;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	private final static String fragmentShaderCode = 
-		"precision mediump float;"+ 
-		"varying vec4 vColor;"+
-		"void main() {"+ 
-		"  gl_FragColor = vColor;" + 
-		"}";
+	private final static String fragmentShaderCode =
+			"precision mediump float;"+
+					"varying vec4 vColor;"+
+					"void main() {"+
+					"  gl_FragColor = vColor;" +
+					"}";
 	// @formatter:on
 
 	public Object3DV2() {
@@ -448,33 +448,33 @@ class Object3DV2 extends Object3DImpl {
 
 /**
  * Drawer using single color & textures
- * 
+ *
  * @author andresoviedo
  *
  */
 class Object3DV3 extends Object3DImpl {
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;" + 
-		"attribute vec4 a_Position;" + 
-		"attribute vec2 a_TexCoordinate;"+ // Per-vertex texture coordinate information we will pass in.
-		"varying vec2 v_TexCoordinate;"+   // This will be passed into the fragment shader.
-		"void main() {" +
-			"  v_TexCoordinate = a_TexCoordinate;"+
-			"  gl_Position = u_MVPMatrix * a_Position;" +
-			"  gl_PointSize = 2.5;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;" +
+					"attribute vec4 a_Position;" +
+					"attribute vec2 a_TexCoordinate;"+ // Per-vertex texture coordinate information we will pass in.
+					"varying vec2 v_TexCoordinate;"+   // This will be passed into the fragment shader.
+					"void main() {" +
+					"  v_TexCoordinate = a_TexCoordinate;"+
+					"  gl_Position = u_MVPMatrix * a_Position;" +
+					"  gl_PointSize = 2.5;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	private final static String fragmentShaderCode = 
-		"precision mediump float;"+ 
-		"uniform vec4 vColor;"+
-		"uniform sampler2D u_Texture;"+ 
-		"varying vec2 v_TexCoordinate;"+ 
-		"void main() {"	+ 
-		"  gl_FragColor = vColor * texture2D(u_Texture, v_TexCoordinate);"+
-		"}";
+	private final static String fragmentShaderCode =
+			"precision mediump float;"+
+					"uniform vec4 vColor;"+
+					"uniform sampler2D u_Texture;"+
+					"varying vec2 v_TexCoordinate;"+
+					"void main() {"	+
+					"  gl_FragColor = vColor * texture2D(u_Texture, v_TexCoordinate);"+
+					"}";
 	// @formatter:on
 
 	public Object3DV3() {
@@ -489,36 +489,36 @@ class Object3DV3 extends Object3DImpl {
 
 /**
  * Drawer using textures & colors
- * 
+ *
  * @author andresoviedo
  *
  */
 class Object3DV4 extends Object3DImpl {
 	// @formatter:off
 	protected final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;" + 
-		"attribute vec4 a_Position;"+
-		"attribute vec4 a_Color;"+
-		"varying vec4 vColor;"+
-		"attribute vec2 a_TexCoordinate;"+
-		"varying vec2 v_TexCoordinate;"+
-		"void main() {" +
-			"  vColor = a_Color;"+
-			"  v_TexCoordinate = a_TexCoordinate;"+
-		    "  gl_Position = u_MVPMatrix * a_Position;"+
-			"  gl_PointSize = 2.5;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;" +
+					"attribute vec4 a_Position;"+
+					"attribute vec4 a_Color;"+
+					"varying vec4 vColor;"+
+					"attribute vec2 a_TexCoordinate;"+
+					"varying vec2 v_TexCoordinate;"+
+					"void main() {" +
+					"  vColor = a_Color;"+
+					"  v_TexCoordinate = a_TexCoordinate;"+
+					"  gl_Position = u_MVPMatrix * a_Position;"+
+					"  gl_PointSize = 2.5;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	protected final static String fragmentShaderCode = 
-		"precision mediump float;"+
-		"varying vec4 vColor;"+
-		"uniform sampler2D u_Texture;"+
-		"varying vec2 v_TexCoordinate;"+
-		"void main() {"	+ 
-		"  gl_FragColor = vColor * texture2D(u_Texture, v_TexCoordinate);"+
-		"}";
+	protected final static String fragmentShaderCode =
+			"precision mediump float;"+
+					"varying vec4 vColor;"+
+					"uniform sampler2D u_Texture;"+
+					"varying vec2 v_TexCoordinate;"+
+					"void main() {"	+
+					"  gl_FragColor = vColor * texture2D(u_Texture, v_TexCoordinate);"+
+					"}";
 	// @formatter:on
 
 	public Object3DV4() {
@@ -539,52 +539,52 @@ class Object3DV4 extends Object3DImpl {
 
 /**
  * Drawer using colors & lights
- * 
+ *
  * @author andresoviedo
  *
  */
 class Object3DV5 extends Object3DImpl {
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;\n" +
-		"attribute vec4 a_Position;\n" +
-		// light variables
-		"uniform mat4 u_MVMatrix;\n"+
-		"uniform vec3 u_LightPos;\n"+
-		"attribute vec4 a_Color;\n"+
-		"attribute vec3 a_Normal;\n"+
-		// calculated color
-		"varying vec4 v_Color;\n"+
-		"void main() {\n" +
-		// Transform the vertex into eye space.
-		  "   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
-		// Get a lighting direction vector from the light to the vertex.
-		   "   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
-		   // Transform the normal's orientation into eye space.
-		   "   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
-		// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-		// pointing in the same direction then it will get max illumination.
-		  "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+  		  													  
-		// Attenuate the light based on distance.
-		   "   float distance = length(u_LightPos - modelViewVertex);\n         "+
-		   "   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
-			//  Add ambient lighting
-			"  diffuse = diffuse + 0.5;"+
-		// Multiply the color by the illumination level. It will be interpolated across the triangle.
-		   "   v_Color = a_Color * diffuse;\n"+
-		    "   v_Color[3] = a_Color[3];"+ // correct alpha
-			"  gl_Position = u_MVPMatrix * a_Position;\n" +
-			"  gl_PointSize = 2.5;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;\n" +
+					"attribute vec4 a_Position;\n" +
+					// light variables
+					"uniform mat4 u_MVMatrix;\n"+
+					"uniform vec3 u_LightPos;\n"+
+					"attribute vec4 a_Color;\n"+
+					"attribute vec3 a_Normal;\n"+
+					// calculated color
+					"varying vec4 v_Color;\n"+
+					"void main() {\n" +
+					// Transform the vertex into eye space.
+					"   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
+					// Get a lighting direction vector from the light to the vertex.
+					"   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
+					// Transform the normal's orientation into eye space.
+					"   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
+					// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
+					// pointing in the same direction then it will get max illumination.
+					"   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+
+					// Attenuate the light based on distance.
+					"   float distance = length(u_LightPos - modelViewVertex);\n         "+
+					"   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
+					//  Add ambient lighting
+					"  diffuse = diffuse + 0.5;"+
+					// Multiply the color by the illumination level. It will be interpolated across the triangle.
+					"   v_Color = a_Color * diffuse;\n"+
+					"   v_Color[3] = a_Color[3];"+ // correct alpha
+					"  gl_Position = u_MVPMatrix * a_Position;\n" +
+					"  gl_PointSize = 2.5;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	private final static String fragmentShaderCode = 
-		"precision mediump float;\n"+ 
-		"varying vec4 v_Color;\n" + 
-		"void main() {\n"+ 
-		"  gl_FragColor = v_Color;\n" + 
-		"}";
+	private final static String fragmentShaderCode =
+			"precision mediump float;\n"+
+					"varying vec4 v_Color;\n" +
+					"void main() {\n"+
+					"  gl_FragColor = v_Color;\n" +
+					"}";
 	// @formatter:on
 
 	public Object3DV5() {
@@ -615,61 +615,61 @@ class Object3DV5 extends Object3DImpl {
 
 /**
  * Drawer using colors, textures & lights
- * 
+ *
  * @author andres
  *
  */
 class Object3DV6 extends Object3DImpl {
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"uniform mat4 u_MVPMatrix;\n" +
-		"attribute vec4 a_Position;\n" +
-	    // texture variables
-	    "attribute vec2 a_TexCoordinate;"+
-		"varying vec2 v_TexCoordinate;"+
-		// light variables
-		"uniform mat4 u_MVMatrix;\n"+
-		"uniform vec3 u_LightPos;\n"+
-		"attribute vec4 a_Color;\n"+
-		"attribute vec3 a_Normal;\n"+
-		// calculated color
-		"varying vec4 v_Color;\n"+
-		"void main() {\n" +
-		// texture
-		   "  v_TexCoordinate = a_TexCoordinate;"+
-		// Transform the vertex into eye space.
-		  "   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
-		// Get a lighting direction vector from the light to the vertex.
-		   "   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
-		   // Transform the normal's orientation into eye space.
-		   "   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
-		// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-		// pointing in the same direction then it will get max illumination.
-		  "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+
-		// Attenuate the light based on distance.
-		   "   float distance = length(u_LightPos - modelViewVertex);\n         "+
-		   "   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
-			//  Add ambient lighting
-			"  diffuse = diffuse + 0.5;"+
-		// Multiply the color by the illumination level. It will be interpolated across the triangle.
-		   "   v_Color = a_Color * diffuse;\n"+
-		   "   v_Color[3] = a_Color[3];"+ // correct alpha
-			"  gl_Position = u_MVPMatrix * a_Position;\n" +
-			"  gl_PointSize = 2.5;  \n"+
-		"}";
+			"uniform mat4 u_MVPMatrix;\n" +
+					"attribute vec4 a_Position;\n" +
+					// texture variables
+					"attribute vec2 a_TexCoordinate;"+
+					"varying vec2 v_TexCoordinate;"+
+					// light variables
+					"uniform mat4 u_MVMatrix;\n"+
+					"uniform vec3 u_LightPos;\n"+
+					"attribute vec4 a_Color;\n"+
+					"attribute vec3 a_Normal;\n"+
+					// calculated color
+					"varying vec4 v_Color;\n"+
+					"void main() {\n" +
+					// texture
+					"  v_TexCoordinate = a_TexCoordinate;"+
+					// Transform the vertex into eye space.
+					"   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
+					// Get a lighting direction vector from the light to the vertex.
+					"   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
+					// Transform the normal's orientation into eye space.
+					"   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
+					// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
+					// pointing in the same direction then it will get max illumination.
+					"   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+
+					// Attenuate the light based on distance.
+					"   float distance = length(u_LightPos - modelViewVertex);\n         "+
+					"   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
+					//  Add ambient lighting
+					"  diffuse = diffuse + 0.5;"+
+					// Multiply the color by the illumination level. It will be interpolated across the triangle.
+					"   v_Color = a_Color * diffuse;\n"+
+					"   v_Color[3] = a_Color[3];"+ // correct alpha
+					"  gl_Position = u_MVPMatrix * a_Position;\n" +
+					"  gl_PointSize = 2.5;  \n"+
+					"}";
 	// @formatter:on
 
 	// @formatter:off
-	private final static String fragmentShaderCode = 
-		"precision mediump float;\n"+ 
-		"varying vec4 v_Color;\n" + 
-		// textures
-		"uniform sampler2D u_Texture;"+
-		"varying vec2 v_TexCoordinate;"+
-		// 
-		"void main() {\n"+ 
-		"  gl_FragColor = v_Color * texture2D(u_Texture, v_TexCoordinate);"+
-		"}";
+	private final static String fragmentShaderCode =
+			"precision mediump float;\n"+
+					"varying vec4 v_Color;\n" +
+					// textures
+					"uniform sampler2D u_Texture;"+
+					"varying vec2 v_TexCoordinate;"+
+					//
+					"void main() {\n"+
+					"  gl_FragColor = v_Color * texture2D(u_Texture, v_TexCoordinate);"+
+					"}";
 	// @formatter:on
 
 	public Object3DV6() {
@@ -782,11 +782,11 @@ class Object3DV7 extends Object3DImpl {
 }
 
 /**
-		* Drawer using color, textures & lights
-		*
-		* @author andres
-		*
-		*/
+ * Drawer using color, textures & lights
+ *
+ * @author andres
+ *
+ */
 class Object3DV8 extends Object3DImpl {
 	// @formatter:off
 	private final static String vertexShaderCode =
@@ -882,26 +882,26 @@ class Object3DV9 extends Object3DImpl {
 
 	// @formatter:off
 	private final static String vertexShaderCode =
-		"const int MAX_JOINTS = 200;\n"
-		+ "const int MAX_WEIGHTS = 3;\n"
-		+ "uniform mat4 u_MVPMatrix;      \n"
-		+ "attribute vec4 a_Position;     \n"
-		+ "attribute vec3 in_jointIndices;\n"
-		+ "attribute vec3 in_weights;\n"
-		+ "uniform mat4 jointTransforms[MAX_JOINTS];\n"
-	// light variables
-		+"uniform mat4 u_MVMatrix;\n"
-		+"uniform vec3 u_LightPos;\n"
-		+"attribute vec3 a_Normal;\n"
-		+"uniform vec4 vColor;\n"
-		+"varying vec4 v_Color;\n"
-	// texture variables
-		+"attribute vec2 a_TexCoordinate;"
-		+"varying vec2 v_TexCoordinate;"
-		+ "void main()                    \n"
-		+ "{                              \n"
-		+ "  vec4 totalLocalPos = vec4(0.0);\n"
-		+ "  vec4 totalNormal = vec4(0.0);\n"
+			"const int MAX_JOINTS = 200;\n"
+					+ "const int MAX_WEIGHTS = 3;\n"
+					+ "uniform mat4 u_MVPMatrix;      \n"
+					+ "attribute vec4 a_Position;     \n"
+					+ "attribute vec3 in_jointIndices;\n"
+					+ "attribute vec3 in_weights;\n"
+					+ "uniform mat4 jointTransforms[MAX_JOINTS];\n"
+					// light variables
+					+"uniform mat4 u_MVMatrix;\n"
+					+"uniform vec3 u_LightPos;\n"
+					+"attribute vec3 a_Normal;\n"
+					+"uniform vec4 vColor;\n"
+					+"varying vec4 v_Color;\n"
+					// texture variables
+					+"attribute vec2 a_TexCoordinate;"
+					+"varying vec2 v_TexCoordinate;"
+					+ "void main()                    \n"
+					+ "{                              \n"
+					+ "  vec4 totalLocalPos = vec4(0.0);\n"
+					+ "  vec4 totalNormal = vec4(0.0);\n"
 
 		/*+ "  for(int i=0;i<MAX_WEIGHTS;i++){\n"
 		+ "    mat4 jointTransform = jointTransforms[in_jointIndices[i]];\n"
@@ -909,54 +909,54 @@ class Object3DV9 extends Object3DImpl {
 		+ "    totalLocalPos += posePosition * in_weights[i];\n"
 		+ "  }\n"*/
 
-		+ "    mat4 jointTransform = jointTransforms[int(in_jointIndices[0])];\n"
-		+ "    vec4 posePosition = jointTransform * a_Position;\n"
-		+ "    totalLocalPos += posePosition * in_weights[0];\n"
+					+ "    mat4 jointTransform = jointTransforms[int(in_jointIndices[0])];\n"
+					+ "    vec4 posePosition = jointTransform * a_Position;\n"
+					+ "    totalLocalPos += posePosition * in_weights[0];\n"
 
-		+ "    jointTransform = jointTransforms[int(in_jointIndices[1])];\n"
-		+ "    posePosition = jointTransform * a_Position;\n"
-		+ "    totalLocalPos += posePosition * in_weights[1];\n"
+					+ "    jointTransform = jointTransforms[int(in_jointIndices[1])];\n"
+					+ "    posePosition = jointTransform * a_Position;\n"
+					+ "    totalLocalPos += posePosition * in_weights[1];\n"
 
-		+ "    jointTransform = jointTransforms[int(in_jointIndices[2])];\n"
-		+ "    posePosition = jointTransform * a_Position;\n"
-		+ "    totalLocalPos += posePosition * in_weights[2];\n"
+					+ "    jointTransform = jointTransforms[int(in_jointIndices[2])];\n"
+					+ "    posePosition = jointTransform * a_Position;\n"
+					+ "    totalLocalPos += posePosition * in_weights[2];\n"
 
 
-		+ "  gl_Position = u_MVPMatrix * totalLocalPos;\n"
-		+ "  gl_PointSize = 2.5;         \n"
+					+ "  gl_Position = u_MVPMatrix * totalLocalPos;\n"
+					+ "  gl_PointSize = 2.5;         \n"
 
-		+ "   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
-				// Get a lighting direction vector from the light to the vertex.
-				"   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
-				// Transform the normal's orientation into eye space.
-				"   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
-				// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-				// pointing in the same direction then it will get max illumination.
-				"   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+
-				// Attenuate the light based on distance.
-				"   float distance = length(u_LightPos - modelViewVertex);\n         "+
-				"   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
-				//  Add ambient lighting
-				"  diffuse = diffuse + 0.5;"+
-				// Multiply the color by the illumination level. It will be interpolated across the triangle.
-				"   v_Color = vColor * diffuse;\n"+
-				"   v_Color[3] = vColor[3];" // correct alpha
+					+ "   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);\n          "+
+					// Get a lighting direction vector from the light to the vertex.
+					"   vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n    "+
+					// Transform the normal's orientation into eye space.
+					"   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n "+
+					// Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
+					// pointing in the same direction then it will get max illumination.
+					"   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);\n   " 	+
+					// Attenuate the light based on distance.
+					"   float distance = length(u_LightPos - modelViewVertex);\n         "+
+					"   diffuse = diffuse * (1.0 / (1.0 + (0.05 * distance * distance)));\n"+
+					//  Add ambient lighting
+					"  diffuse = diffuse + 0.5;"+
+					// Multiply the color by the illumination level. It will be interpolated across the triangle.
+					"   v_Color = vColor * diffuse;\n"+
+					"   v_Color[3] = vColor[3];" // correct alpha
 
-	// texture
+					// texture
 					+"  v_TexCoordinate = a_TexCoordinate;"
-		+ "}                              \n";
+					+ "}                              \n";
 	// @formatter:on
 
 	// @formatter:off
 	private final static String fragmentShaderCode =
 			"precision mediump float;\n"+
-			"varying vec4 v_Color;\n"+
+					"varying vec4 v_Color;\n"+
 					// textures
-			"uniform sampler2D u_Texture;"+
-			"varying vec2 v_TexCoordinate;"+
-			"void main() {\n"+
-			"  gl_FragColor = v_Color * texture2D(u_Texture, v_TexCoordinate);\n" +
-			"}";
+					"uniform sampler2D u_Texture;"+
+					"varying vec2 v_TexCoordinate;"+
+					"void main() {\n"+
+					"  gl_FragColor = v_Color * texture2D(u_Texture, v_TexCoordinate);\n" +
+					"}";
 	// @formatter:on
 
 	public Object3DV9() {

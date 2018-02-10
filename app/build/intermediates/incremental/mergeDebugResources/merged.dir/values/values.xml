@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="menu_items">
-        <item>Load Model</item>
-        <item>Models</item>
+        <!-- <item>Load Model</item>
+        <item>Models</item>-->
         <item>Demo</item>
         <!-- <item>Settings</item> -->
-        <item>Help</item>
-        <item>About</item>
+        <!-- <item>Help</item>
+        <item>About</item> -->
         <item>Exit</item>
     </string-array>
     <color name="black_overlay">#66000000</color>
@@ -37,15 +37,10 @@
     <string name="toggle_textures">Toggle textures</string>
     <string name="toggle_wireframe">Toggle wireframe</string>
     <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-
-        -->
+        
     </style>
     <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        
     </style>
     <style name="ButtonBar">
         <item name="android:paddingLeft">2dp</item>

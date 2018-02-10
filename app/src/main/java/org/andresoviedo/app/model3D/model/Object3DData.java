@@ -25,7 +25,7 @@ import android.util.Log;
 
 /**
  * This is the basic 3D data necessary to build the 3D object
- * 
+ *
  * @author andres
  *
  */
@@ -119,7 +119,7 @@ public class Object3DData {
 	}
 
 	public Object3DData(FloatBuffer vertexArrayBuffer, FloatBuffer vertexColorsArrayBuffer,
-			FloatBuffer textureCoordsArrayBuffer, byte[] texData) {
+						FloatBuffer textureCoordsArrayBuffer, byte[] texData) {
 		this.vertexArrayBuffer = vertexArrayBuffer;
 		this.vertexColorsArrayBuffer = vertexColorsArrayBuffer;
 		this.textureCoordsArrayBuffer = textureCoordsArrayBuffer;
@@ -128,7 +128,7 @@ public class Object3DData {
 	}
 
 	public Object3DData(FloatBuffer verts, FloatBuffer normals, ArrayList<Tuple3> texCoords, Faces faces,
-			FaceMaterials faceMats, Materials materials) {
+						FaceMaterials faceMats, Materials materials) {
 		super();
 		this.vertexBuffer = verts;
 		this.vertexNormalsBuffer = normals;
@@ -490,7 +490,7 @@ public class Object3DData {
 		float topPt = Float.MIN_VALUE, bottomPt = Float.MAX_VALUE; // on y-axis
 		float farPt = Float.MAX_VALUE, nearPt = Float.MIN_VALUE; // on z-axis
 
-		 FloatBuffer vertexBuffer = getVertexArrayBuffer() != null ? getVertexArrayBuffer() : getVertexBuffer();
+		FloatBuffer vertexBuffer = getVertexArrayBuffer() != null ? getVertexArrayBuffer() : getVertexBuffer();
 		if (vertexBuffer == null) {
 			Log.v("Object3DData", "Scaling for '" + getId() + "' I found that there is no vertex data");
 			return this;

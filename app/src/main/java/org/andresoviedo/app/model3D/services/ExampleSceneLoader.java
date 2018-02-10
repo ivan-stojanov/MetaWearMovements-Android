@@ -23,11 +23,28 @@ import android.widget.Toast;
 
 /**
  * This class loads a 3D scene as an example of what can be done with the app
- * 
+ *
  * @author andresoviedo
  *
  */
 public class ExampleSceneLoader extends SceneLoader {
+
+	public Object3DData bodyHands = null;
+	public Object3DData getBodyHands()
+	{
+		return bodyHands;
+	}
+	public void setBodyHands(float[] bodyHandsLines)
+	{
+		bodyHands = Object3DBuilder.buildLine(bodyHandsLines);
+		return;
+	}
+	public float[] overwriteBodyHands = null;
+	public void setOverwriteBodyHands(float[] overwriteBodyHandsLines)
+	{
+		overwriteBodyHands = overwriteBodyHandsLines;
+	}
+
 
 	public ExampleSceneLoader(ModelActivity modelActivity) {
 		super(modelActivity);
@@ -51,11 +68,46 @@ public class ExampleSceneLoader extends SceneLoader {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
+					if(overwriteBodyHands == null){
+						bodyHands = Object3DBuilder.buildLine(
+								new float[] {
+										0.0f, 1.5f, 0.5f, -0.1f, 1.15f, 0.5f,
+										-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, 0.5f,
+										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+										0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
+								});
+					} else {
+						bodyHands = Object3DBuilder.buildLine(overwriteBodyHands);
+					}
+
+					bodyHands.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyHands);
+
 					// 3D Axis
 					Object3DData axis = Object3DBuilder.buildAxis().setId("axis");
 					axis.setColor(new float[] { 1.0f, 0, 0, 1.0f });
 					addObject(axis);
 
+					Object3DData bodyBase = Object3DBuilder.buildLine(
+							new float[] { 0.0f, 0.75f, 0.5f, 0.0f, 1.7f, 0.5f });
+					bodyBase.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyBase);
+
+					Object3DData bodyLeggs = Object3DBuilder.buildLine(
+							new float[] { 0.0f, 0.75f, 0.5f, -0.25f, 0.0f, 0.5f,
+									0.0f, 0.75f, 0.5f, +0.25f, 0.0f, 0.5f });
+					bodyLeggs.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyLeggs);
+
+					Object3DData bodyHead = Object3DBuilder.buildLine(
+							new float[] { 0.0f, 1.7f, 0.5f, 0.15f, 1.85f, 0.5f,
+									0.15f, 1.85f, 0.5f, 0f, 2f, 0.5f,
+									0f, 2f, 0.5f, -0.15f, 1.85f, 0.5f,
+									-0.15f, 1.85f, 0.5f, 0.0f, 1.7f, 0.5f});
+					bodyHead.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+					addObject(bodyHead);
+
+/*
 					// test cube made of arrays
 					Object3DData obj10 = Object3DBuilder.buildCubeV1();
 					obj10.setColor(new float[] { 1f, 0f, 0f, 0.5f });
@@ -184,7 +236,7 @@ public class ExampleSceneLoader extends SceneLoader {
 					} catch (Exception ex) {
 						errors.add(ex);
 					}
-
+*/
 					// test loading collada object
 					/*try {
 						// this has heterogeneous faces

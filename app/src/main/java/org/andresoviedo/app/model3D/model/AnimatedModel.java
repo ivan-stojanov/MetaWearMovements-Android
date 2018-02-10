@@ -9,14 +9,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
- * 
+ *
  * This class represents an entity in the world that can be animated. It
  * contains the model's VAO which contains the mesh data, the texture, and the
  * root joint of the joint hierarchy, or "skeleton". It also holds an int which
  * represents the number of joints that the model's skeleton contains, and has
  * its own {@link Animator} instance which can be used to apply animations to
  * this entity.
- * 
+ *
  * @author Karl
  *
  */
@@ -46,7 +46,7 @@ public class AnimatedModel extends Object3DData {
 	 * @param jointCount
 	 *            - the number of joints in the joint hierarchy (skeleton) for
 	 *            this entity.
-	 * 
+	 *
 	 */
 	public AnimatedModel setRootJoint(Joint rootJoint, int jointCount) {
 		this.rootJoint = rootJoint;
@@ -107,7 +107,7 @@ public class AnimatedModel extends Object3DData {
 	 * joints (with the current animation pose applied) in the entity. The
 	 * joints are ordered in the array based on their joint index. The position
 	 * of each joint's transform in the array is equal to the joint's index.
-	 * 
+	 *
 	 * @return The array of model-space transforms of the joints in the current
 	 *         animation pose.
 	 */
@@ -124,7 +124,7 @@ public class AnimatedModel extends Object3DData {
 	 * This adds the current model-space transform of a joint (and all of its
 	 * descendants) into an array of transforms. The joint's transform is added
 	 * into the array at the position equal to the joint's index.
-	 * 
+	 *
 	 * @param headJoint
 	 *            - the current joint being added to the array. This method also
 	 *            adds the transforms of all the descendents of this joint too.

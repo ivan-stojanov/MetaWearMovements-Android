@@ -3,7 +3,9 @@ package org.andresoviedo.app.model3D.view;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Random;
 
+import org.andresoviedo.app.model3D.model.Object3DBuilder;
 import org.andresoviedo.app.model3D.services.ExampleSceneLoader;
 import org.andresoviedo.app.model3D.services.SceneLoader;
 import org.andresoviedo.app.util.Utils;
@@ -19,6 +21,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +30,7 @@ import android.widget.Toast;
 
 /**
  * This activity represents the container for our 3D viewer.
- * 
+ *
  * @author andresoviedo
  */
 public class ModelActivity extends Activity {
@@ -92,7 +95,46 @@ public class ModelActivity extends Activity {
 		} else {
 			scene = new SceneLoader(this);
 		}
+
 		scene.init();
+
+//if(scene.getBodyHands() != null)
+		{
+
+			final Handler handlerTimer = new Handler();
+			final int delay = 1000; //milliseconds
+			final float countMove = 0.05f;
+			handlerTimer.postDelayed(new Runnable(){
+				public void run(){
+					//do something
+					scene.replaceObject(0,
+							//countMove = countMove + 0.05f;
+							Object3DBuilder.buildLine(
+									new float[] {
+											-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, new Random().nextFloat()
+									}
+							).setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f })
+					);
+
+					handlerTimer.postDelayed(this, delay);
+				}
+			}, delay);
+
+
+
+	/*scene.setOverwriteBodyHands(
+			new float[] {
+					0.0f, 1.5f, 0.25f, -0.1f, 1.15f, 0.25f//,
+					//-0.1f, 1.15f, 0.5f, -0.1f, 0.75f, 0.5f,
+					//0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+					//0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
+			}
+	);
+	scene.init();*/
+			//scene.setBodyHands();
+			//Log.i("ivan getBodyHands:", scene.getBodyHands().toString());
+		}
+
 
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -160,27 +202,27 @@ public class ModelActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.model_toggle_wireframe:
-			scene.toggleWireframe();
-			break;
-		case R.id.model_toggle_boundingbox:
-			scene.toggleBoundingBox();
-			break;
-		case R.id.model_toggle_textures:
-			scene.toggleTextures();
-			break;
-		case R.id.model_toggle_lights:
-			scene.toggleLighting();
-			break;
-		case R.id.model_load_texture:
-			Intent target = Utils.createGetContentIntent();
-			Intent intent = Intent.createChooser(target, "Select a file");
-			try {
-				startActivityForResult(intent, REQUEST_CODE_OPEN_FILE);
-			} catch (ActivityNotFoundException e) {
-				// The reason for the existence of aFileChooser
-			}
-			break;
+			case R.id.model_toggle_wireframe:
+				scene.toggleWireframe();
+				break;
+			case R.id.model_toggle_boundingbox:
+				scene.toggleBoundingBox();
+				break;
+			case R.id.model_toggle_textures:
+				scene.toggleTextures();
+				break;
+			case R.id.model_toggle_lights:
+				scene.toggleLighting();
+				break;
+			case R.id.model_load_texture:
+				Intent target = Utils.createGetContentIntent();
+				Intent intent = Intent.createChooser(target, "Select a file");
+				try {
+					startActivityForResult(intent, REQUEST_CODE_OPEN_FILE);
+				} catch (ActivityNotFoundException e) {
+					// The reason for the existence of aFileChooser
+				}
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -33,7 +33,7 @@ public class MenuActivity extends ListActivity {
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_menu_item,
 				getResources().getStringArray(R.array.menu_items)));
 	}
-	
+
 	// @Override
 	// public boolean onCreateOptionsMenu(Menu menu) {
 	// // Inflate the menu; this adds items to the action bar if it is present.
@@ -54,57 +54,57 @@ public class MenuActivity extends ListActivity {
 		}
 		try {
 			switch (action) {
-			case DEMO: {// Start Model activity.
-				Intent intent = new Intent(MenuActivity.this.getApplicationContext(), ModelActivity.class);
-				Bundle b = new Bundle();
-				b.putString("backgroundColor", "0 0 0 1");
-				intent.putExtras(b);
-				MenuActivity.this.startActivity(intent);
-				break;
-			}
-			case MODELS: {
-				// Start Model activity.
-				Intent intent = new Intent(MenuActivity.this.getApplicationContext(), DemoActivity.class);
-				MenuActivity.this.startActivity(intent);
-			}
-				break;
-			case LOAD_MODEL: {
-				Intent target = Utils.createGetContentIntent();
-				Intent intent = Intent.createChooser(target, "Select a file");
-				try {
-					startActivityForResult(intent, REQUEST_CODE_OPEN_FILE);
-				} catch (ActivityNotFoundException e) {
-					// The reason for the existence of aFileChooser
+				case DEMO: {// Start Model activity.
+					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), ModelActivity.class);
+					Bundle b = new Bundle();
+					b.putString("backgroundColor", "0 0 0 1");
+					intent.putExtras(b);
+					MenuActivity.this.startActivity(intent);
+					break;
 				}
-			}
+				case MODELS: {
+					// Start Model activity.
+					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), DemoActivity.class);
+					MenuActivity.this.startActivity(intent);
+				}
 				break;
-			case ABOUT: {
-				Intent intent = new Intent(MenuActivity.this.getApplicationContext(), TextActivity.class);
-				Bundle b = new Bundle();
-				b.putString("title", selectedItem);
-				b.putString("text", getResources().getString(R.string.about_text));
-				intent.putExtras(b);
-				MenuActivity.this.startActivity(intent);
-			}
+				case LOAD_MODEL: {
+					Intent target = Utils.createGetContentIntent();
+					Intent intent = Intent.createChooser(target, "Select a file");
+					try {
+						startActivityForResult(intent, REQUEST_CODE_OPEN_FILE);
+					} catch (ActivityNotFoundException e) {
+						// The reason for the existence of aFileChooser
+					}
+				}
 				break;
-			case HELP: {
-				Intent intent = new Intent(MenuActivity.this.getApplicationContext(), TextActivity.class);
-				Bundle b = new Bundle();
-				b.putString("title", selectedItem);
-				b.putString("text", getResources().getString(R.string.help_text));
-				intent.putExtras(b);
-				MenuActivity.this.startActivity(intent);
-			}
+				case ABOUT: {
+					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), TextActivity.class);
+					Bundle b = new Bundle();
+					b.putString("title", selectedItem);
+					b.putString("text", getResources().getString(R.string.about_text));
+					intent.putExtras(b);
+					MenuActivity.this.startActivity(intent);
+				}
 				break;
-			case SETTINGS:
+				case HELP: {
+					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), TextActivity.class);
+					Bundle b = new Bundle();
+					b.putString("title", selectedItem);
+					b.putString("text", getResources().getString(R.string.help_text));
+					intent.putExtras(b);
+					MenuActivity.this.startActivity(intent);
+				}
 				break;
-			case EXIT:
-				MenuActivity.this.finish();
-				break;
-			case UNKNOWN:
-				Toast.makeText(getApplicationContext(), "Unrecognized action '" + selectedAction + "'",
-						Toast.LENGTH_LONG).show();
-				break;
+				case SETTINGS:
+					break;
+				case EXIT:
+					MenuActivity.this.finish();
+					break;
+				case UNKNOWN:
+					Toast.makeText(getApplicationContext(), "Unrecognized action '" + selectedAction + "'",
+							Toast.LENGTH_LONG).show();
+					break;
 			}
 		} catch (Exception ex) {
 			Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -115,24 +115,24 @@ public class MenuActivity extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-		case REQUEST_CODE_OPEN_FILE:
-			if (resultCode == RESULT_OK) {
-				// The URI of the selected file
-				final Uri uri = data.getData();
-				Log.i("Menu", "Loading '" + uri.toString() + "'");
-				if (uri != null) {
-					final String path = ContentUtils.getPath(getApplicationContext(), uri);
-					if (path != null) {
-						launchModelRendererActivity(path);
-					} else {
-						Toast.makeText(getApplicationContext(), "Problem loading '" + uri.toString() + "'",
-								Toast.LENGTH_SHORT).show();
+			case REQUEST_CODE_OPEN_FILE:
+				if (resultCode == RESULT_OK) {
+					// The URI of the selected file
+					final Uri uri = data.getData();
+					Log.i("Menu", "Loading '" + uri.toString() + "'");
+					if (uri != null) {
+						final String path = ContentUtils.getPath(getApplicationContext(), uri);
+						if (path != null) {
+							launchModelRendererActivity(path);
+						} else {
+							Toast.makeText(getApplicationContext(), "Problem loading '" + uri.toString() + "'",
+									Toast.LENGTH_SHORT).show();
+						}
 					}
+				} else {
+					Toast.makeText(getApplicationContext(), "Result when loading file was '" + resultCode + "'",
+							Toast.LENGTH_SHORT).show();
 				}
-			} else {
-				Toast.makeText(getApplicationContext(), "Result when loading file was '" + resultCode + "'",
-						Toast.LENGTH_SHORT).show();
-			}
 		}
 	}
 

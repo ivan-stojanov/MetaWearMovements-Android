@@ -25,11 +25,25 @@ import android.widget.Toast;
 
 /**
  * This class loads a 3D scena as an example of what can be done with the app
- * 
+ *
  * @author andresoviedo
  *
  */
 public class SceneLoader {
+
+	public Object3DData getBodyHands()
+	{
+		return null;
+	}
+	public void setBodyHands(float[] bodyHandsLines)
+	{
+		return;
+	}
+	public float[] overwriteBodyHands = null;
+	public void setOverwriteBodyHands(float[] overwriteBodyHandsLines)
+	{
+		overwriteBodyHands = overwriteBodyHandsLines;
+	}
 
 	/**
 	 * Default model color: yellow
@@ -190,6 +204,17 @@ public class SceneLoader {
 	protected synchronized void addObject(Object3DData obj) {
 		List<Object3DData> newList = new ArrayList<Object3DData>(objects);
 		newList.add(obj);
+		this.objects = newList;
+		requestRender();
+	}
+
+	public synchronized void replaceObject(int position, Object3DData obj) {
+		List<Object3DData> newList = new ArrayList<Object3DData>(objects);
+		if(newList.size() > position){
+			newList.set(position, obj);
+		} else {
+			newList.add(obj);
+		}
 		this.objects = newList;
 		requestRender();
 	}

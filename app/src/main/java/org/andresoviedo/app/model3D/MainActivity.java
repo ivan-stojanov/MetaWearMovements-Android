@@ -17,10 +17,10 @@ import android.widget.Toast;
 
 /**
  * This is the main android activity. From here we launch the whole stuff.
- * 
+ *
  * Basically, this activity may serve to show a Splash screen and copy the assets (obj models) from the jar to external
  * directory.
- * 
+ *
  * @author andresoviedo
  *
  */
@@ -108,7 +108,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Copy all models from jar to the user's sd card.
-	 * 
+	 *
 	 * TODO: Alert when the directory already exists and our app is not the directory owner (cause copy will fail)
 	 */
 	private void installExamples() {

@@ -58,14 +58,14 @@ public final class Object3DBuilder {
 			0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, // z-
 
 			0.95f, 0.05f, 0, 1, 0, 0, 0.95f, -0.05f, 0, 1, 0f, 0f, // Arrow X (>)
-			-0.95f, 0.05f, 0, -1, 0, 0, -0.95f, -0.05f, 0, -1, 0f, 0f, // Arrow X (<)
+			//-0.95f, 0.05f, 0, -1, 0, 0, -0.95f, -0.05f, 0, -1, 0f, 0f, // Arrow X (<)
 			-0.05f, 0.95f, 0, 0, 1, 0, 0.05f, 0.95f, 0, 0, 1f, 0f, // Arrox Y (^)
-			-0.05f, 0, 0.95f, 0, 0, 1, 0.05f, 0, 0.95f, 0, 0, 1, // Arrox z (v)
+			-0.05f, 0, 0.95f, 0, 0, 1, 0.05f, 0, 0.95f, 0, 0, 1, // Arrox Z (v)
 
 			1.05F, 0.05F, 0, 1.10F, -0.05F, 0, 1.05F, -0.05F, 0, 1.10F, 0.05F, 0, // Letter X
 			-0.05F, 1.05F, 0, 0.05F, 1.10F, 0, -0.05F, 1.10F, 0, 0.0F, 1.075F, 0, // Letter Y
 			-0.05F, 0.05F, 1.05F, 0.05F, 0.05F, 1.05F, 0.05F, 0.05F, 1.05F, -0.05F, -0.05F, 1.05F, -0.05F, -0.05F,
-			1.05F, 0.05F, -0.05F, 1.05F // letter z
+			1.05F, 0.05F, -0.05F, 1.05F // letter Z
 			//@formatter:on
 	};
 
@@ -618,72 +618,72 @@ public final class Object3DBuilder {
 
 
 		//if (textureData != null) {
-			ArrayList<Tuple3> texCoords = obj.getTexCoords();
-			if (texCoords != null && texCoords.size() > 0) {
+		ArrayList<Tuple3> texCoords = obj.getTexCoords();
+		if (texCoords != null && texCoords.size() > 0) {
 
-				Log.i("Object3DBuilder", "Allocating/populating texture buffer...");
-				FloatBuffer textureCoordsBuffer = createNativeByteBuffer(texCoords.size() * 2 * 4).asFloatBuffer();
-				for (Tuple3 texCor : texCoords) {
-					textureCoordsBuffer.put(texCor.getX());
-					textureCoordsBuffer.put(obj.isFlipTextCoords() ? 1 - texCor.getY() : texCor.getY());
-				}
+			Log.i("Object3DBuilder", "Allocating/populating texture buffer...");
+			FloatBuffer textureCoordsBuffer = createNativeByteBuffer(texCoords.size() * 2 * 4).asFloatBuffer();
+			for (Tuple3 texCor : texCoords) {
+				textureCoordsBuffer.put(texCor.getX());
+				textureCoordsBuffer.put(obj.isFlipTextCoords() ? 1 - texCor.getY() : texCor.getY());
+			}
+
+			Log.i("Object3DBuilder", "Populating texture array buffer...");
+			FloatBuffer textureCoordsArraysBuffer = createNativeByteBuffer(2 * faces.getVerticesReferencesCount() * 4).asFloatBuffer();
+			obj.setTextureCoordsArrayBuffer(textureCoordsArraysBuffer);
+
+			try {
+
+				boolean anyTextureOk = false;
+				String currentTexture = null;
 
 				Log.i("Object3DBuilder", "Populating texture array buffer...");
-				FloatBuffer textureCoordsArraysBuffer = createNativeByteBuffer(2 * faces.getVerticesReferencesCount() * 4).asFloatBuffer();
-				obj.setTextureCoordsArrayBuffer(textureCoordsArraysBuffer);
+				int counter = 0;
+				for (int i = 0; i < faces.facesTexIdxs.size(); i++) {
 
-				try {
-
-					boolean anyTextureOk = false;
-					String currentTexture = null;
-
-					Log.i("Object3DBuilder", "Populating texture array buffer...");
-					int counter = 0;
-					for (int i = 0; i < faces.facesTexIdxs.size(); i++) {
-
-						// get current texture
-						if (!faceMats.isEmpty() && faceMats.findMaterial(i) != null) {
-							Material mat = materials.getMaterial(faceMats.findMaterial(i));
-							if (mat != null && mat.getTexture() != null) {
-								currentTexture = mat.getTexture();
-							}
-						}
-
-						// check if texture is ok (Because we only support 1 texture currently)
-						boolean textureOk = false;
-						if (currentTexture != null && currentTexture.equals(texture)) {
-							textureOk = true;
-						}
-
-						// populate texture coords if ok (in case we have more than 1 texture and 1 is missing. see face.obj example)
-						int[] text = faces.facesTexIdxs.get(i);
-						for (int j = 0; j < text.length; j++) {
-							if (textureData == null || textureOk) {
-								anyTextureOk = true;
-								textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[j] * 2));
-								textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[j] * 2 + 1));
-							} else {
-								textureCoordsArraysBuffer.put(counter++, 0f);
-								textureCoordsArraysBuffer.put(counter++, 0f);
-							}
+					// get current texture
+					if (!faceMats.isEmpty() && faceMats.findMaterial(i) != null) {
+						Material mat = materials.getMaterial(faceMats.findMaterial(i));
+						if (mat != null && mat.getTexture() != null) {
+							currentTexture = mat.getTexture();
 						}
 					}
 
-					if (!anyTextureOk) {
-						Log.i("Object3DBuilder", "Texture is wrong. Applying global texture");
-						counter = 0;
-						for (int j=0; j<faces.facesTexIdxs.size(); j++) {
-							int[] text = faces.facesTexIdxs.get(j);
-							for (int i = 0; i < text.length; i++) {
-								textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[i] * 2));
-								textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[i] * 2 + 1));
-							}
+					// check if texture is ok (Because we only support 1 texture currently)
+					boolean textureOk = false;
+					if (currentTexture != null && currentTexture.equals(texture)) {
+						textureOk = true;
+					}
+
+					// populate texture coords if ok (in case we have more than 1 texture and 1 is missing. see face.obj example)
+					int[] text = faces.facesTexIdxs.get(i);
+					for (int j = 0; j < text.length; j++) {
+						if (textureData == null || textureOk) {
+							anyTextureOk = true;
+							textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[j] * 2));
+							textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[j] * 2 + 1));
+						} else {
+							textureCoordsArraysBuffer.put(counter++, 0f);
+							textureCoordsArraysBuffer.put(counter++, 0f);
 						}
 					}
-				} catch (Exception ex) {
-					Log.e("Object3DBuilder", "Failure to load texture coordinates", ex);
 				}
+
+				if (!anyTextureOk) {
+					Log.i("Object3DBuilder", "Texture is wrong. Applying global texture");
+					counter = 0;
+					for (int j=0; j<faces.facesTexIdxs.size(); j++) {
+						int[] text = faces.facesTexIdxs.get(j);
+						for (int i = 0; i < text.length; i++) {
+							textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[i] * 2));
+							textureCoordsArraysBuffer.put(counter++, textureCoordsBuffer.get(text[i] * 2 + 1));
+						}
+					}
+				}
+			} catch (Exception ex) {
+				Log.e("Object3DBuilder", "Failure to load texture coordinates", ex);
 			}
+		}
 		//}
 		obj.setTextureData(textureData);
 
@@ -800,12 +800,12 @@ public final class Object3DBuilder {
 		try {
 			IntBuffer drawOrder = createNativeByteBuffer(objData.getFaces().getIndexBuffer().capacity() * 2 * 4).asIntBuffer();
 			for (int i = 0; i < objData.getFaces().getIndexBuffer().capacity(); i+=3) {
-					drawOrder.put(objData.getFaces().getIndexBuffer().get(i));
-					drawOrder.put((objData.getFaces().getIndexBuffer().get(i+1)));
-					drawOrder.put((objData.getFaces().getIndexBuffer().get(i+1)));
-					drawOrder.put((objData.getFaces().getIndexBuffer().get(i+2)));
-					drawOrder.put((objData.getFaces().getIndexBuffer().get(i+2)));
-					drawOrder.put((objData.getFaces().getIndexBuffer().get(i)));
+				drawOrder.put(objData.getFaces().getIndexBuffer().get(i));
+				drawOrder.put((objData.getFaces().getIndexBuffer().get(i+1)));
+				drawOrder.put((objData.getFaces().getIndexBuffer().get(i+1)));
+				drawOrder.put((objData.getFaces().getIndexBuffer().get(i+2)));
+				drawOrder.put((objData.getFaces().getIndexBuffer().get(i+2)));
+				drawOrder.put((objData.getFaces().getIndexBuffer().get(i)));
 			}
 			return new Object3DData(objData.getVertexBuffer()).setDrawOrder(drawOrder).
 					setVertexNormalsArrayBuffer(objData.getVertexNormalsBuffer()).setColor(objData.getColor())
@@ -913,7 +913,7 @@ public final class Object3DBuilder {
 
 
 	public static void loadV6AsyncParallel_Obj(final Activity parent, final File file, final String assetsDir, final String assetName,
-										   final Callback callback) {
+											   final Callback callback) {
 
 		final String modelId = file != null ? file.getName() : assetName;
 		final File currentDir = file != null ? file.getParentFile() : null;

@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 
 /**
  * This is the actual opengl view. From here we can detect touch gestures for example
- * 
+ *
  * @author andresoviedo
  *
  */
