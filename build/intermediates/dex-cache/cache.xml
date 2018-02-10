@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_bdd2c78a1293b34442125678138f79e832cef883\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b1afbd29dfdae9f2e6146e34f89984950acd6276">
+        <dex dex="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_3ff380e5135588dbac97c981593cca34aae2e268\classes.dex" />
+    </item>
+
+</items>
