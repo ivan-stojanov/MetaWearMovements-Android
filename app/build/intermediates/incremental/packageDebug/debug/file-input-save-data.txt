@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Mon Feb 19 19:38:00 CET 2018
+#Mon Feb 19 22:40:12 CET 2018
 5.base=D\:\\Knigi za Fax\\Postdiplomski\\Web-Orientirano Softversko Inzinjerstvo\\AndroidApp\\app\\build\\intermediates\\assets\\debug
 42.base=D\:\\Knigi za Fax\\Postdiplomski\\Web-Orientirano Softversko Inzinjerstvo\\AndroidApp\\app\\build\\intermediates\\assets\\debug
 22.path=models/cowboy.png
