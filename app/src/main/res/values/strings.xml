@@ -6,6 +6,7 @@
     <string name="action_settings">Settings</string>
     <!-- Activities -->
     <string name="title_activity_menu">Menu</string>
+    <string name="title_activity_sensors">Sensors</string>
     <string name="title_activity_demo">Demo</string>
     <string name="title_activity_text">Text</string>
     <string name="title_activity_model">Model</string>
@@ -15,6 +16,7 @@
     <string-array name="menu_items">
         <!-- <item>Load Model</item>
         <item>Models</item>-->
+        <item>Sensors</item>
         <item>Demo</item>
         <!-- <item>Settings</item> -->
         <!-- <item>Help</item>
@@ -44,5 +46,11 @@
 
     <!-- To review -->
     <string name="app_logo_desc">Teapot animated logo</string>
+
+    <!-- With Sensors implementation -->
+    <string name="title_connecting">Connecting</string>
+    <string name="title_reconnect_attempt">Reconnecting</string>
+    <string name="message_wait">Please wait</string>
+    <string name="action_disconnect">Disconnect</string>
 
 </resources>

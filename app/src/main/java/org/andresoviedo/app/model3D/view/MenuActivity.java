@@ -23,7 +23,7 @@ public class MenuActivity extends ListActivity {
 	private static final int REQUEST_CODE_OPEN_FILE = 1000;
 
 	private static enum Action {
-		LOAD_MODEL, MODELS, SETTINGS, HELP, ABOUT, EXIT, UNKNOWN, DEMO
+		LOAD_MODEL, MODELS, SETTINGS, HELP, ABOUT, EXIT, UNKNOWN, DEMO, SENSORS
 	};
 
 	@Override
@@ -62,6 +62,12 @@ public class MenuActivity extends ListActivity {
 					MenuActivity.this.startActivity(intent);
 					break;
 				}
+				case SENSORS: {
+					// Start Sensors activity.
+					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), SensorsActivity.class);
+					MenuActivity.this.startActivity(intent);
+				}
+				break;
 				case MODELS: {
 					// Start Model activity.
 					Intent intent = new Intent(MenuActivity.this.getApplicationContext(), DemoActivity.class);
