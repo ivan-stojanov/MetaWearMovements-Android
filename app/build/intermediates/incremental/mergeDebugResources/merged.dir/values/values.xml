@@ -3,6 +3,7 @@
     <string-array name="menu_items">
         <!-- <item>Load Model</item>
         <item>Models</item>-->
+        <item>Sensors</item>
         <item>Demo</item>
         <!-- <item>Settings</item> -->
         <!-- <item>Help</item>
