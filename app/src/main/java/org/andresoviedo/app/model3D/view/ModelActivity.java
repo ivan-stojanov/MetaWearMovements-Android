@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.andresoviedo.app.model3D.SensorData;
+import org.andresoviedo.app.model3D.SensorDevice;
 import org.andresoviedo.app.model3D.model.Object3DBuilder;
 import org.andresoviedo.app.model3D.services.ExampleSceneLoader;
 import org.andresoviedo.app.model3D.services.SceneLoader;
@@ -95,150 +97,15 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 	private Handler handler;
 
-	private static final float[] MMA845Q_RANGES= {2.f, 4.f, 8.f}, BOSCH_RANGES = {2.f, 4.f, 8.f, 16.f};
-	//private static final float INITIAL_RANGE= 2.f;
-    private static final float ACC_FREQ= 50.f;
-	private int rangeIndex= 0;
-	protected float samplePeriod;
-	protected Route streamRouteAcc = null;
-    protected Route streamRouteGYRO = null;
-	private static final float[] AVAILABLE_RANGES= {125.f, 250.f, 500.f, 1000.f, 2000.f};
-	//private static final float INITIAL_RANGE= 125.f;
-    private static final float GYR_ODR= 25.f;
+	SensorDevice sensor1 = null;
 	//private boolean boardReady= false;
 	private static final String LOG_TAG_ACC = "Model1ActivityTagACC";
 	private static final String LOG_TAG_GYRO = "Model1ActivityTagGYRO";
-	private MetaWearBoard mwBoard;
-	private Accelerometer accelerometer;
-	private GyroBmi160 gyroBmi160;
 	private Debug debug;
 	private Logging logging;
 
 	BtleService.LocalBinder serviceBinder;
 	BluetoothDevice btDevice1;
-
-	public class DataRowAccGyro{
-		public float accX;
-		public float accY;
-		public float accZ;
-		public float gyroX;
-		public float gyroY;
-		public float gyroZ;
-		public boolean hasAcc = false;
-		public boolean hasGyro = false;
-		public Long timestampAcc;
-		public Long timestampGyro;
-		public float[] Quaternion = new float[] { 1f, 0f, 0f, 0f };
-		public float[] eInt = new float[] { 0f, 0f, 0f };
-		public float Kp = 1;
-		public float Ki = 0;
-		public float SamplePeriod;
-
-		public DataRowAccGyro(){
-			hasAcc = false;
-			hasGyro = false;
-		}
-
-		public void setAccParams(float x, float y, float z, float sPeriod){
-			accX = x;
-			accY = y;
-			accZ = z;
-			hasAcc = true;
-			timestampAcc = System.currentTimeMillis();
-			SamplePeriod = sPeriod;
-		}
-
-		public void setGyroParams(float x, float y, float z){
-			gyroX = x;
-			gyroY = y;
-			gyroZ = z;
-			hasGyro = true;
-			timestampGyro = System.currentTimeMillis();
-
-			if(hasAcc == true)
-				printAllParams();
-		}
-
-		public void printAllParams(){
-			if(scene != null){
-				scene.replaceObject(0,
-						Object3DBuilder.buildLine(
-								new float[] {
-										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
-										0.1f, 1.15f, 0.5f, 0.1f, 0.75f, accX + accY//new Random().nextFloat()
-								}
-						).setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f })
-				);
-
-				String printResult = "accX = " + Float.toString(accX) + " ; accY = " + Float.toString(accY) + " ; accZ = " + Float.toString(accZ) + " ; ";
-				printResult += "gyroX = " + Float.toString(gyroX) + " ; gyroY = " + Float.toString(gyroY) + " ; gyroZ = " + Float.toString(gyroZ) + " ; ";
-				//printResult += "timestampAcc = " + Long.toString(timestampAcc) + " ; timestampGyro = " + Long.toString(timestampGyro) + " ; \n";
-				Log.i(LOG_TAG_GYRO, printResult);
-			}
-
-			//calculate Quaternion
-			float q1 = Quaternion[0], q2 = Quaternion[1], q3 = Quaternion[2], q4 = Quaternion[3];   // short name local variable for readability
-			float norm;
-			float vx, vy, vz;
-			float ex, ey, ez;
-			float pa, pb, pc;
-
-			// Normalise accelerometer measurement
-			norm = (float)Math.sqrt(accX * accX + accY * accY + accZ * accZ);
-			if (norm == 0f) return; // handle NaN
-			norm = 1 / norm;        // use reciprocal for division
-			accX *= norm;
-			accY *= norm;
-			accZ *= norm;
-
-			// Estimated direction of gravity
-			vx = 2.0f * (q2 * q4 - q1 * q3);
-			vy = 2.0f * (q1 * q2 + q3 * q4);
-			vz = q1 * q1 - q2 * q2 - q3 * q3 + q4 * q4;
-
-			// Error is cross product between estimated direction and measured direction of gravity
-			ex = (accY * vz - accZ * vy);
-			ey = (accZ * vx - accX * vz);
-			ez = (accX * vy - accY * vx);
-			if (Ki > 0f)
-			{
-				eInt[0] += ex;      // accumulate integral error
-				eInt[1] += ey;
-				eInt[2] += ez;
-			}
-			else
-			{
-				eInt[0] = 0.0f;     // prevent integral wind up
-				eInt[1] = 0.0f;
-				eInt[2] = 0.0f;
-			}
-
-			// Apply feedback terms
-			gyroX = gyroX + Kp * ex + Ki * eInt[0];
-			gyroY = gyroY + Kp * ey + Ki * eInt[1];
-			gyroZ = gyroZ + Kp * ez + Ki * eInt[2];
-
-			// Integrate rate of change of quaternion
-			pa = q2;
-			pb = q3;
-			pc = q4;
-			q1 = q1 + (-q2 * gyroX - q3 * gyroY - q4 * gyroZ) * (0.5f * SamplePeriod);
-			q2 = pa + (q1 * gyroX + pb * gyroZ - pc * gyroY) * (0.5f * SamplePeriod);
-			q3 = pb + (q1 * gyroY - pa * gyroZ + pc * gyroX) * (0.5f * SamplePeriod);
-			q4 = pc + (q1 * gyroZ + pa * gyroY - pb * gyroX) * (0.5f * SamplePeriod);
-
-			// Normalise quaternion
-			norm = (float)Math.sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
-			norm = 1.0f / norm;
-			Quaternion[0] = q1 * norm;
-			Quaternion[1] = q2 * norm;
-			Quaternion[2] = q3 * norm;
-			Quaternion[3] = q4 * norm;
-
-			Log.i(LOG_TAG_GYRO, "Quaternion:   " + Float.toString(Quaternion[0]) + " , " + Float.toString(Quaternion[1]) + " , " + Float.toString(Quaternion[2]) + " , " + Float.toString(Quaternion[3]));
-		}
-	}
-	ArrayList<DataRowAccGyro> list = new ArrayList<DataRowAccGyro>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -538,123 +405,9 @@ public class ModelActivity extends Activity implements ServiceConnection {
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
 		serviceBinder = (BtleService.LocalBinder) service;
-
-		String mwMacAddress= "C1:5F:8D:92:E5:07";   ///< Put your board's MAC address here
 		BluetoothManager btManager= (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-		btDevice1= btManager.getAdapter().getRemoteDevice(mwMacAddress);
-		mwBoard= serviceBinder.getMetaWearBoard(btDevice1);
-		/*try {
-			boardReady= true;
-			boardReady();
-		} catch (UnsupportedModuleException e) {
-			Log.i(LOG_TAG_ACC, "unsupportedModule()");
-		}*/
 
-		mwBoard.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
-			@Override
-			public Task<Route> then(Task<Void> task) throws Exception {
-				DataRowAccGyro DataRowAccGyroObjectItem = new DataRowAccGyro();
-				//accelerometer
-				accelerometer = mwBoard.getModule(Accelerometer.class);
-				accelerometer.configure()
-						.odr(50f)
-						.commit();
-
-				Accelerometer.ConfigEditor<?> editor = accelerometer.configure();
-				editor.odr(ACC_FREQ);
-				if (accelerometer instanceof AccelerometerBosch) {
-					editor.range(BOSCH_RANGES[rangeIndex]);
-				} else if (accelerometer instanceof AccelerometerMma8452q) {
-					editor.range(MMA845Q_RANGES[rangeIndex]);
-				}
-				editor.commit();
-				samplePeriod= 1 / accelerometer.getOdr();
-
-				final AsyncDataProducer producerAcc = accelerometer.packedAcceleration() == null ?
-						accelerometer.packedAcceleration() :
-						accelerometer.acceleration();
-
-				producerAcc.addRouteAsync(source -> source.stream((data, env) -> {
-					//Log.i(LOG_TAG_ACC, data.value(Acceleration.class).toString());
-					final Acceleration value = data.value(Acceleration.class);
-					DataRowAccGyroObjectItem.setAccParams(value.x(), value.y(), value.z(), samplePeriod);
-				})).continueWith(taskAcc -> {
-					streamRouteAcc = taskAcc.getResult();
-					producerAcc.start();
-					accelerometer.start();
-
-					return null;
-				});
-
-				//Log.i(LOG_TAG_ACC, "Actual accelerometer Odr = " + accelerometer.getOdr());
-				//Log.i(LOG_TAG_ACC, "Actual accelerometer Range = " + accelerometer.getRange());
-/*
-				accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
-					@Override
-					public void configure(RouteComponent source) {
-						source.stream(new Subscriber() {
-							@Override
-							public void apply(Data data, Object... env) {
-								Log.i(LOG_TAG_ACC, data.value(Acceleration.class).toString());
-							}
-						});
-					}
-				});
-*/
-				//gyro
-				gyroBmi160 = mwBoard.getModule(GyroBmi160.class);
-				gyroBmi160.configure()
-						.odr(GyroBmi160.OutputDataRate.ODR_50_HZ)
-						.range(GyroBmi160.Range.FSR_2000)
-						.commit();
-
-				final float period = 1 / GYR_ODR;
-				final AsyncDataProducer producerGYRO = gyroBmi160.packedAngularVelocity() == null ?
-						gyroBmi160.packedAngularVelocity() :
-						gyroBmi160.angularVelocity();
-				producerGYRO.addRouteAsync(source -> source.stream((data, env) -> {
-					//Log.i(LOG_TAG_GYRO, data.value(AngularVelocity.class).toString());
-					final AngularVelocity value = data.value(AngularVelocity.class);
-					DataRowAccGyroObjectItem.setGyroParams(value.x(), value.y(), value.z());
-				})).continueWith(taskGYRO -> {
-                    streamRouteGYRO = taskGYRO.getResult();
-					gyroBmi160.angularVelocity().start();
-					gyroBmi160.start();
-
-					return null;
-				});
-
-				/*gyroBmi160.angularVelocity().addRouteAsync(new RouteBuilder() {
-					@Override
-					public void configure(RouteComponent source) {
-						source.stream(new Subscriber() {
-							@Override
-							public void apply(Data data, Object ... env) {
-								Log.i(LOG_TAG_GYRO, data.value(AngularVelocity.class).toString());
-							}
-						});
-					}
-				}).continueWith(new Continuation<Route, Void>() {
-					@Override
-					public Void then(Task<Route> task) throws Exception {
-						gyroBmi160.angularVelocity();
-						gyroBmi160.start();
-						return null;
-					}
-				});*/
-
-				return null;
-			}
-		}).continueWith(new Continuation<Route, Void>() {
-
-			@Override
-			public Void then(Task<Route> task) throws Exception {
-				accelerometer.acceleration().start();
-				accelerometer.start();
-
-				return null;
-			}
-		});
+		sensor1 = new SensorDevice("C1:5F:8D:92:E5:07", btManager, serviceBinder, "Sensor1"); ///< Put your board's MAC address here
 	}
 
 	@Override
@@ -668,26 +421,11 @@ public class ModelActivity extends Activity implements ServiceConnection {
 		super.onBackPressed();
 	}
 
-	public void stopStreams(){
-		if (streamRouteAcc != null) {
-            streamRouteAcc.remove();
-            streamRouteAcc = null;
-		}
-        if (streamRouteGYRO != null) {
-            streamRouteGYRO.remove();
-            streamRouteGYRO = null;
-        }
-		if(accelerometer != null){
-			accelerometer.stop();
+	public void stopStreams()
+	{
+		if (sensor1 != null)
+			sensor1.stopStreams();
 
-			(accelerometer.packedAcceleration() == null ?
-					accelerometer.packedAcceleration() :
-					accelerometer.acceleration()
-			).stop();
-			//accelerometer.stop();
-			//accelerometer.acceleration().stop();
-			Log.i(LOG_TAG_ACC, "accelerometer stopped");
-		}
 		if(logging != null){
 			logging.stop();
 			logging.downloadAsync().continueWith(new Continuation<Void, Void>() {
@@ -697,14 +435,6 @@ public class ModelActivity extends Activity implements ServiceConnection {
 					return null;
 				}
 			});
-		}
-		if(gyroBmi160 != null){
-			gyroBmi160.stop();
-			(gyroBmi160.packedAngularVelocity() == null ?
-					gyroBmi160.packedAngularVelocity() :
-					gyroBmi160.angularVelocity()
-			).stop();
-			Log.i(LOG_TAG_GYRO, "gyroBmi160 stopped");
 		}
 	}
 }
