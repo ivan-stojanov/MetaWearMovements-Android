@@ -128,18 +128,24 @@ public class ModelActivity extends Activity implements ServiceConnection {
 		public boolean hasGyro = false;
 		public Long timestampAcc;
 		public Long timestampGyro;
+		public float[] Quaternion = new float[] { 1f, 0f, 0f, 0f };
+		public float[] eInt = new float[] { 0f, 0f, 0f };
+		public float Kp = 1;
+		public float Ki = 0;
+		public float SamplePeriod;
 
 		public DataRowAccGyro(){
 			hasAcc = false;
 			hasGyro = false;
 		}
 
-		public void setAccParams(float x, float y, float z){
+		public void setAccParams(float x, float y, float z, float sPeriod){
 			accX = x;
 			accY = y;
 			accZ = z;
 			hasAcc = true;
 			timestampAcc = System.currentTimeMillis();
+			SamplePeriod = sPeriod;
 		}
 
 		public void setGyroParams(float x, float y, float z){
@@ -169,6 +175,67 @@ public class ModelActivity extends Activity implements ServiceConnection {
 				//printResult += "timestampAcc = " + Long.toString(timestampAcc) + " ; timestampGyro = " + Long.toString(timestampGyro) + " ; \n";
 				Log.i(LOG_TAG_GYRO, printResult);
 			}
+
+			//calculate Quaternion
+			float q1 = Quaternion[0], q2 = Quaternion[1], q3 = Quaternion[2], q4 = Quaternion[3];   // short name local variable for readability
+			float norm;
+			float vx, vy, vz;
+			float ex, ey, ez;
+			float pa, pb, pc;
+
+			// Normalise accelerometer measurement
+			norm = (float)Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+			if (norm == 0f) return; // handle NaN
+			norm = 1 / norm;        // use reciprocal for division
+			accX *= norm;
+			accY *= norm;
+			accZ *= norm;
+
+			// Estimated direction of gravity
+			vx = 2.0f * (q2 * q4 - q1 * q3);
+			vy = 2.0f * (q1 * q2 + q3 * q4);
+			vz = q1 * q1 - q2 * q2 - q3 * q3 + q4 * q4;
+
+			// Error is cross product between estimated direction and measured direction of gravity
+			ex = (accY * vz - accZ * vy);
+			ey = (accZ * vx - accX * vz);
+			ez = (accX * vy - accY * vx);
+			if (Ki > 0f)
+			{
+				eInt[0] += ex;      // accumulate integral error
+				eInt[1] += ey;
+				eInt[2] += ez;
+			}
+			else
+			{
+				eInt[0] = 0.0f;     // prevent integral wind up
+				eInt[1] = 0.0f;
+				eInt[2] = 0.0f;
+			}
+
+			// Apply feedback terms
+			gyroX = gyroX + Kp * ex + Ki * eInt[0];
+			gyroY = gyroY + Kp * ey + Ki * eInt[1];
+			gyroZ = gyroZ + Kp * ez + Ki * eInt[2];
+
+			// Integrate rate of change of quaternion
+			pa = q2;
+			pb = q3;
+			pc = q4;
+			q1 = q1 + (-q2 * gyroX - q3 * gyroY - q4 * gyroZ) * (0.5f * SamplePeriod);
+			q2 = pa + (q1 * gyroX + pb * gyroZ - pc * gyroY) * (0.5f * SamplePeriod);
+			q3 = pb + (q1 * gyroY - pa * gyroZ + pc * gyroX) * (0.5f * SamplePeriod);
+			q4 = pc + (q1 * gyroZ + pa * gyroY - pb * gyroX) * (0.5f * SamplePeriod);
+
+			// Normalise quaternion
+			norm = (float)Math.sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
+			norm = 1.0f / norm;
+			Quaternion[0] = q1 * norm;
+			Quaternion[1] = q2 * norm;
+			Quaternion[2] = q3 * norm;
+			Quaternion[3] = q4 * norm;
+
+			Log.i(LOG_TAG_GYRO, "Quaternion:   " + Float.toString(Quaternion[0]) + " , " + Float.toString(Quaternion[1]) + " , " + Float.toString(Quaternion[2]) + " , " + Float.toString(Quaternion[3]));
 		}
 	}
 	ArrayList<DataRowAccGyro> list = new ArrayList<DataRowAccGyro>();
@@ -510,7 +577,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 				producerAcc.addRouteAsync(source -> source.stream((data, env) -> {
 					//Log.i(LOG_TAG_ACC, data.value(Acceleration.class).toString());
 					final Acceleration value = data.value(Acceleration.class);
-					DataRowAccGyroObjectItem.setAccParams(value.x(), value.y(), value.z());
+					DataRowAccGyroObjectItem.setAccParams(value.x(), value.y(), value.z(), samplePeriod);
 				})).continueWith(taskAcc -> {
 					streamRouteAcc = taskAcc.getResult();
 					producerAcc.start();
