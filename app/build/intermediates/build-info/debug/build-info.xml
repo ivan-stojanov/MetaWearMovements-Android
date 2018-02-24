@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <instant-run
     abi="armeabi-v7a,armeabi"
-    api-level="24"
+    api-level="21"
     build-mode="COLD"
-    density="xhdpi"
+    density="hdpi"
     format="10"
     plugin-version="3.0.1"
-    timestamp="1519076570352"
+    timestamp="1519488961416"
     token="-2519086308824172865"
     verifier="COLD_SWAP_REQUESTED" >
 
@@ -25,16 +25,13 @@
 
     <build
         build-mode="FULL"
-        timestamp="1519076408626"
+        timestamp="1519486250463"
         verifier="FULL_BUILD_REQUESTED" >
         <artifact
-            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_4.apk"
             type="SPLIT" />
         <artifact
-            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\outputs\apk\debug\app-debug.apk"
-            type="SPLIT_MAIN" />
-        <artifact
-            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_4.apk"
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
             type="SPLIT" />
         <artifact
             location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_8.apk"
@@ -63,10 +60,25 @@
         <artifact
             location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_2.apk"
             type="SPLIT" />
+        <artifact
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\outputs\apk\debug\app-debug.apk"
+            type="SPLIT_MAIN" />
     </build>
     <build
         build-mode="COLD"
-        timestamp="1519076570352"
+        ir-eligibility="CLASS_ADDED"
+        timestamp="1519488912681"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
+            type="SPLIT" />
+        <artifact
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\outputs\apk\debug\app-debug.apk"
+            type="SPLIT_MAIN" />
+    </build>
+    <build
+        build-mode="COLD"
+        timestamp="1519488961416"
         verifier="COLD_SWAP_REQUESTED" />
 
 </instant-run>

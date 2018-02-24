@@ -18,11 +18,11 @@ public final class R {
         public static final int blescan_control = 0x7f090021;
         public static final int blescan_devices = 0x7f090022;
         public static final int blescan_entry_layout = 0x7f090023;
-        public static final int button_ok = 0x7f090027;
-        public static final int instructions_text = 0x7f090056;
-        public static final int invalid_mac_address_text = 0x7f090057;
-        public static final int mac_address_string = 0x7f09005f;
-        public static final int title_text = 0x7f0900aa;
+        public static final int button_ok = 0x7f090029;
+        public static final int instructions_text = 0x7f090058;
+        public static final int invalid_mac_address_text = 0x7f090059;
+        public static final int mac_address_string = 0x7f090061;
+        public static final int title_text = 0x7f0900ac;
     }
     public static final class layout {
         public static final int blescan_device_list = 0x7f0b0024;
