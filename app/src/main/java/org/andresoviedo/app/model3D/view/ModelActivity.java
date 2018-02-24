@@ -3,6 +3,9 @@ package org.andresoviedo.app.model3D.view;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.andresoviedo.app.model3D.model.Object3DBuilder;
@@ -28,17 +31,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.mbientlab.metawear.AsyncDataProducer;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.Subscriber;
+import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.builder.RouteBuilder;
 import com.mbientlab.metawear.builder.RouteComponent;
@@ -48,6 +56,8 @@ import com.mbientlab.metawear.builder.function.Function1;
 import com.mbientlab.metawear.data.Acceleration;
 import com.mbientlab.metawear.data.AngularVelocity;
 import com.mbientlab.metawear.module.Accelerometer;
+import com.mbientlab.metawear.module.AccelerometerBosch;
+import com.mbientlab.metawear.module.AccelerometerMma8452q;
 import com.mbientlab.metawear.module.Debug;
 import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.Logging;
@@ -85,9 +95,19 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 	private Handler handler;
 
-
-	private static final String LOG_TAG_ACC = "ModelActivityTagACC";
-	private static final String LOG_TAG_GYRO = "ModelActivityTagGYRO";
+	private static final float[] MMA845Q_RANGES= {2.f, 4.f, 8.f}, BOSCH_RANGES = {2.f, 4.f, 8.f, 16.f};
+	//private static final float INITIAL_RANGE= 2.f;
+    private static final float ACC_FREQ= 50.f;
+	private int rangeIndex= 0;
+	protected float samplePeriod;
+	protected Route streamRouteAcc = null;
+    protected Route streamRouteGYRO = null;
+	private static final float[] AVAILABLE_RANGES= {125.f, 250.f, 500.f, 1000.f, 2000.f};
+	//private static final float INITIAL_RANGE= 125.f;
+    private static final float GYR_ODR= 25.f;
+	//private boolean boardReady= false;
+	private static final String LOG_TAG_ACC = "Model1ActivityTagACC";
+	private static final String LOG_TAG_GYRO = "Model1ActivityTagGYRO";
 	private MetaWearBoard mwBoard;
 	private Accelerometer accelerometer;
 	private GyroBmi160 gyroBmi160;
@@ -96,6 +116,62 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 	BtleService.LocalBinder serviceBinder;
 	BluetoothDevice btDevice1;
+
+	public class DataRowAccGyro{
+		public float accX;
+		public float accY;
+		public float accZ;
+		public float gyroX;
+		public float gyroY;
+		public float gyroZ;
+		public boolean hasAcc = false;
+		public boolean hasGyro = false;
+		public Long timestampAcc;
+		public Long timestampGyro;
+
+		public DataRowAccGyro(){
+			hasAcc = false;
+			hasGyro = false;
+		}
+
+		public void setAccParams(float x, float y, float z){
+			accX = x;
+			accY = y;
+			accZ = z;
+			hasAcc = true;
+			timestampAcc = System.currentTimeMillis();
+		}
+
+		public void setGyroParams(float x, float y, float z){
+			gyroX = x;
+			gyroY = y;
+			gyroZ = z;
+			hasGyro = true;
+			timestampGyro = System.currentTimeMillis();
+
+			if(hasAcc == true)
+				printAllParams();
+		}
+
+		public void printAllParams(){
+			if(scene != null){
+				scene.replaceObject(0,
+						Object3DBuilder.buildLine(
+								new float[] {
+										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+										0.1f, 1.15f, 0.5f, 0.1f, 0.75f, accX + accY//new Random().nextFloat()
+								}
+						).setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f })
+				);
+
+				String printResult = "accX = " + Float.toString(accX) + " ; accY = " + Float.toString(accY) + " ; accZ = " + Float.toString(accZ) + " ; ";
+				printResult += "gyroX = " + Float.toString(gyroX) + " ; gyroY = " + Float.toString(gyroY) + " ; gyroZ = " + Float.toString(gyroZ) + " ; ";
+				//printResult += "timestampAcc = " + Long.toString(timestampAcc) + " ; timestampGyro = " + Long.toString(timestampGyro) + " ; \n";
+				Log.i(LOG_TAG_GYRO, printResult);
+			}
+		}
+	}
+	ArrayList<DataRowAccGyro> list = new ArrayList<DataRowAccGyro>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +215,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 		final Handler handlerTimer = new Handler();
 		final int delay = 1000; //milliseconds
-		handlerTimer.postDelayed(new Runnable(){
+		/*handlerTimer.postDelayed(new Runnable(){
 			public void run(){
 				scene.replaceObject(0,
 					Object3DBuilder.buildLine(
@@ -152,7 +228,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 				handlerTimer.postDelayed(this, delay);
 			}
-		}, delay);
+		}, delay);*/
 
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -164,8 +240,6 @@ public class ModelActivity extends Activity implements ServiceConnection {
 		setupOnSystemVisibilityChangeListener();
 
 		getApplicationContext().bindService(new Intent(this, BtleService.class), this, Context.BIND_AUTO_CREATE);
-
-
 		//findViewById(R.id.btn_start).bringToFront();
 		//findViewById(R.id.btn_stop).bringToFront();
 	}
@@ -365,6 +439,34 @@ public class ModelActivity extends Activity implements ServiceConnection {
 				}
 		}
 	}
+	/*
+	protected void boardReady() throws UnsupportedModuleException{
+		accelerometer = mwBoard.getModuleOrThrow(Accelerometer.class);
+		//fillRangeAdapter();
+	}
+
+	private void fillRangeAdapter() {
+		ArrayAdapter<CharSequence> spinnerAdapter= null;
+		if (accelerometer instanceof AccelerometerBosch) {
+			spinnerAdapter= ArrayAdapter.createFromResource(getContext(), R.array.values_bmi160_acc_range, android.R.layout.simple_spinner_item);
+		} else if (accelerometer instanceof AccelerometerMma8452q) {
+			spinnerAdapter= ArrayAdapter.createFromResource(getContext(), R.array.values_mma8452q_acc_range, android.R.layout.simple_spinner_item);
+		}
+
+		if (spinnerAdapter != null) {
+			spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			accRangeSelection.setAdapter(spinnerAdapter);
+		}
+	}
+
+	private void unsupportedModule() {
+		new AlertDialog.Builder(getActivity()).setTitle(R.string.title_error)
+				.setMessage(String.format("%s %s", getContext().getString(sensorResId), getActivity().getString(R.string.error_unsupported_module)))
+				.setCancelable(false)
+				.setPositiveButton(R.string.label_ok, (dialog, id) -> enableDisableViewGroup((ViewGroup) getView(), false))
+				.create()
+				.show();
+	}*/
 
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
@@ -373,21 +475,53 @@ public class ModelActivity extends Activity implements ServiceConnection {
 		String mwMacAddress= "C1:5F:8D:92:E5:07";   ///< Put your board's MAC address here
 		BluetoothManager btManager= (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 		btDevice1= btManager.getAdapter().getRemoteDevice(mwMacAddress);
-
 		mwBoard= serviceBinder.getMetaWearBoard(btDevice1);
+		/*try {
+			boardReady= true;
+			boardReady();
+		} catch (UnsupportedModuleException e) {
+			Log.i(LOG_TAG_ACC, "unsupportedModule()");
+		}*/
+
 		mwBoard.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
 			@Override
 			public Task<Route> then(Task<Void> task) throws Exception {
-
+				DataRowAccGyro DataRowAccGyroObjectItem = new DataRowAccGyro();
 				//accelerometer
 				accelerometer = mwBoard.getModule(Accelerometer.class);
 				accelerometer.configure()
 						.odr(50f)
 						.commit();
 
+				Accelerometer.ConfigEditor<?> editor = accelerometer.configure();
+				editor.odr(ACC_FREQ);
+				if (accelerometer instanceof AccelerometerBosch) {
+					editor.range(BOSCH_RANGES[rangeIndex]);
+				} else if (accelerometer instanceof AccelerometerMma8452q) {
+					editor.range(MMA845Q_RANGES[rangeIndex]);
+				}
+				editor.commit();
+				samplePeriod= 1 / accelerometer.getOdr();
+
+				final AsyncDataProducer producerAcc = accelerometer.packedAcceleration() == null ?
+						accelerometer.packedAcceleration() :
+						accelerometer.acceleration();
+
+				producerAcc.addRouteAsync(source -> source.stream((data, env) -> {
+					//Log.i(LOG_TAG_ACC, data.value(Acceleration.class).toString());
+					final Acceleration value = data.value(Acceleration.class);
+					DataRowAccGyroObjectItem.setAccParams(value.x(), value.y(), value.z());
+				})).continueWith(taskAcc -> {
+					streamRouteAcc = taskAcc.getResult();
+					producerAcc.start();
+					accelerometer.start();
+
+					return null;
+				});
+
 				//Log.i(LOG_TAG_ACC, "Actual accelerometer Odr = " + accelerometer.getOdr());
 				//Log.i(LOG_TAG_ACC, "Actual accelerometer Range = " + accelerometer.getRange());
-
+/*
 				accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
 					@Override
 					public void configure(RouteComponent source) {
@@ -399,7 +533,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 						});
 					}
 				});
-
+*/
 				//gyro
 				gyroBmi160 = mwBoard.getModule(GyroBmi160.class);
 				gyroBmi160.configure()
@@ -407,7 +541,23 @@ public class ModelActivity extends Activity implements ServiceConnection {
 						.range(GyroBmi160.Range.FSR_2000)
 						.commit();
 
-				gyroBmi160.angularVelocity().addRouteAsync(new RouteBuilder() {
+				final float period = 1 / GYR_ODR;
+				final AsyncDataProducer producerGYRO = gyroBmi160.packedAngularVelocity() == null ?
+						gyroBmi160.packedAngularVelocity() :
+						gyroBmi160.angularVelocity();
+				producerGYRO.addRouteAsync(source -> source.stream((data, env) -> {
+					//Log.i(LOG_TAG_GYRO, data.value(AngularVelocity.class).toString());
+					final AngularVelocity value = data.value(AngularVelocity.class);
+					DataRowAccGyroObjectItem.setGyroParams(value.x(), value.y(), value.z());
+				})).continueWith(taskGYRO -> {
+                    streamRouteGYRO = taskGYRO.getResult();
+					gyroBmi160.angularVelocity().start();
+					gyroBmi160.start();
+
+					return null;
+				});
+
+				/*gyroBmi160.angularVelocity().addRouteAsync(new RouteBuilder() {
 					@Override
 					public void configure(RouteComponent source) {
 						source.stream(new Subscriber() {
@@ -424,7 +574,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 						gyroBmi160.start();
 						return null;
 					}
-				});
+				});*/
 
 				return null;
 			}
@@ -434,6 +584,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 			public Void then(Task<Route> task) throws Exception {
 				accelerometer.acceleration().start();
 				accelerometer.start();
+
 				return null;
 			}
 		});
@@ -441,19 +592,33 @@ public class ModelActivity extends Activity implements ServiceConnection {
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
-		stopAcceleration();
+		stopStreams();
 	}
 
 	@Override
 	public void onBackPressed() {
-		stopAcceleration();
+		stopStreams();
 		super.onBackPressed();
 	}
 
-	public void stopAcceleration(){
+	public void stopStreams(){
+		if (streamRouteAcc != null) {
+            streamRouteAcc.remove();
+            streamRouteAcc = null;
+		}
+        if (streamRouteGYRO != null) {
+            streamRouteGYRO.remove();
+            streamRouteGYRO = null;
+        }
 		if(accelerometer != null){
 			accelerometer.stop();
-			accelerometer.acceleration().stop();
+
+			(accelerometer.packedAcceleration() == null ?
+					accelerometer.packedAcceleration() :
+					accelerometer.acceleration()
+			).stop();
+			//accelerometer.stop();
+			//accelerometer.acceleration().stop();
 			Log.i(LOG_TAG_ACC, "accelerometer stopped");
 		}
 		if(logging != null){
