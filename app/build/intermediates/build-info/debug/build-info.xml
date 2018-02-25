@@ -6,7 +6,7 @@
     density="hdpi"
     format="10"
     plugin-version="3.0.1"
-    timestamp="1519505565842"
+    timestamp="1519581259890"
     token="-2519086308824172865"
     verifier="COLD_SWAP_REQUESTED" >
 
@@ -25,7 +25,7 @@
 
     <build
         build-mode="FULL"
-        timestamp="1519499301056"
+        timestamp="1519579117068"
         verifier="FULL_BUILD_REQUESTED" >
         <artifact
             location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
@@ -66,20 +66,20 @@
     </build>
     <build
         build-mode="COLD"
-        ir-eligibility="FIELD_TYPE_CHANGE"
-        timestamp="1519503415634"
+        ir-eligibility="FIELD_ADDED"
+        timestamp="1519580854580"
         verifier="COLD_SWAP_REQUESTED" >
         <artifact
-            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
             type="SPLIT" />
     </build>
     <build
         build-mode="COLD"
-        ir-eligibility="FIELD_TYPE_CHANGE"
-        timestamp="1519503739679"
+        ir-eligibility="COMPATIBLE"
+        timestamp="1519581170157"
         verifier="COLD_SWAP_REQUESTED" >
         <artifact
-            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
+            location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
             type="SPLIT" />
         <artifact
             location="D:\Knigi za Fax\Postdiplomski\Web-Orientirano Softversko Inzinjerstvo\AndroidApp\app\build\outputs\apk\debug\app-debug.apk"
@@ -87,7 +87,7 @@
     </build>
     <build
         build-mode="COLD"
-        timestamp="1519505565842"
+        timestamp="1519581259890"
         verifier="COLD_SWAP_REQUESTED" />
 
 </instant-run>
