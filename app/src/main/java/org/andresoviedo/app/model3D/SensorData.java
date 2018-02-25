@@ -3,6 +3,7 @@ package org.andresoviedo.app.model3D;
 import android.util.Log;
 
 import org.andresoviedo.app.model3D.model.Object3DBuilder;
+import org.andresoviedo.app.model3D.view.ModelActivity;
 
 /**
  * Created by Ivan on 2018-02-24.
@@ -26,10 +27,13 @@ public class SensorData
     public float Ki = 0;
     public float SamplePeriod;
     public String LOG_TAG = "SensorDataTag";
+    public ModelActivity modelActivity;
 
-    public SensorData(){
+    public SensorData(String logtagVal, ModelActivity modelActivityVal){
         hasAcc = false;
         hasGyro = false;
+        LOG_TAG = logtagVal;
+        modelActivity = modelActivityVal;
     }
 
     public void setAccParams(float x, float y, float z, float sPeriod){
@@ -128,6 +132,7 @@ public class SensorData
         Quaternion[2] = q3 * norm;
         Quaternion[3] = q4 * norm;
 
-        Log.i(LOG_TAG, "Quaternion:   " + Float.toString(Quaternion[0]) + " , " + Float.toString(Quaternion[1]) + " , " + Float.toString(Quaternion[2]) + " , " + Float.toString(Quaternion[3]));
+        modelActivity.collectData(LOG_TAG, Quaternion, System.currentTimeMillis());
+        //Log.i(LOG_TAG, "Quaternion:   " + Float.toString(Quaternion[0]) + " , " + Float.toString(Quaternion[1]) + " , " + Float.toString(Quaternion[2]) + " , " + Float.toString(Quaternion[3]));
     }
 }

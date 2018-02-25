@@ -15,6 +15,8 @@ import com.mbientlab.metawear.module.AccelerometerBosch;
 import com.mbientlab.metawear.module.AccelerometerMma8452q;
 import com.mbientlab.metawear.module.GyroBmi160;
 
+import org.andresoviedo.app.model3D.view.ModelActivity;
+
 import bolts.Continuation;
 import bolts.Task;
 
@@ -44,7 +46,7 @@ public class SensorDevice
     public static final float GYR_ODR= 25.f;
     public String LOG_TAG;
 
-    public SensorDevice(String mwMacAddressVal, BluetoothManager btManagerVal, BtleService.LocalBinder serviceBinderVal, String logtagVal)
+    public SensorDevice(String mwMacAddressVal, BluetoothManager btManagerVal, BtleService.LocalBinder serviceBinderVal, String logtagVal, ModelActivity modelActivity)
     {
         mwMacAddress = mwMacAddressVal;
         btManager = btManagerVal;
@@ -57,7 +59,7 @@ public class SensorDevice
         mwBoard.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
             @Override
             public Task<Route> then(Task<Void> task) throws Exception {
-                SensorData SensorDataObject = new SensorData();
+                SensorData SensorDataObject = new SensorData(logtagVal, modelActivity);
                 SensorDataObject.LOG_TAG = LOG_TAG;
                 //accelerometer
                 accelerometer = mwBoard.getModule(Accelerometer.class);

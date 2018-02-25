@@ -98,9 +98,16 @@ public class ModelActivity extends Activity implements ServiceConnection {
 	private Handler handler;
 
 	SensorDevice sensor1 = null;
+	SensorDevice sensor2 = null;
+	SensorDevice sensor3 = null;
+	SensorDevice sensor4 = null;
 	//private boolean boardReady= false;
 	private static final String LOG_TAG_ACC = "Model1ActivityTagACC";
 	private static final String LOG_TAG_GYRO = "Model1ActivityTagGYRO";
+	private static final String LOG_TAG_SENSOR1 = "Sensor1";
+	private static final String LOG_TAG_SENSOR2 = "Sensor2";
+	private static final String LOG_TAG_SENSOR3 = "Sensor3";
+	private static final String LOG_TAG_SENSOR4 = "Sensor4";
 	private Debug debug;
 	private Logging logging;
 
@@ -407,7 +414,62 @@ public class ModelActivity extends Activity implements ServiceConnection {
 		serviceBinder = (BtleService.LocalBinder) service;
 		BluetoothManager btManager= (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 
-		sensor1 = new SensorDevice("C1:5F:8D:92:E5:07", btManager, serviceBinder, "Sensor1"); ///< Put your board's MAC address here
+		sensor1 = new SensorDevice("C1:5F:8D:92:E5:07", btManager, serviceBinder, LOG_TAG_SENSOR1, this); ///< Put your board's MAC address here
+		sensor2 = new SensorDevice("DE:C2:19:1D:A5:91", btManager, serviceBinder, LOG_TAG_SENSOR2, this); ///< Put your board's MAC address here
+		//sensor3 = new SensorDevice("Put your board's MAC address here", btManager, serviceBinder, LOG_TAG_SENSOR3, this); ///< Put your board's MAC address here
+		//sensor4 = new SensorDevice("Put your board's MAC address here", btManager, serviceBinder, LOG_TAG_SENSOR4, this); ///< Put your board's MAC address here
+	}
+
+	public Long lastTimestampSensor1 = Long.valueOf(0);
+	public float[] lastQuaternionSensor1;
+	public Long lastTimestampSensor2 = Long.valueOf(0);
+	public float[] lastQuaternionSensor2;
+	public Long lastTimestampSensor3 = Long.valueOf(0);
+	public float[] lastQuaternionSensor3;
+	public Long lastTimestampSensor4 = Long.valueOf(0);
+	public float[] lastQuaternionSensor4;
+
+	public void collectData(String sensorName, float[] Quaternion, Long timestampData)
+	{
+		if(scene != null) {
+			if(sensorName == LOG_TAG_SENSOR1) {
+				lastQuaternionSensor1 = Quaternion;
+				lastTimestampSensor1 = timestampData;
+			} else if(sensorName == LOG_TAG_SENSOR2) {
+				lastQuaternionSensor2 = Quaternion;
+				lastTimestampSensor2 = timestampData;
+			} else if(sensorName == LOG_TAG_SENSOR3) {
+				lastQuaternionSensor3 = Quaternion;
+				lastTimestampSensor3 = timestampData;
+			} else if(sensorName == LOG_TAG_SENSOR4) {
+				lastQuaternionSensor4 = Quaternion;
+				lastTimestampSensor4 = timestampData;
+			}
+
+			if( lastTimestampSensor1 != Long.valueOf(0) &&
+				lastTimestampSensor2 != Long.valueOf(0))
+				//lastTimestampSensor3 != Long.valueOf(0) &&
+				//lastTimestampSensor4 != Long.valueOf(0))
+			{
+				scene.replaceObject(0,
+						Object3DBuilder.buildLine(
+								new float[]{
+										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, Quaternion[1],
+										0.1f, 1.15f, Quaternion[1], 0.1f, 0.75f, Quaternion[0]
+								}
+						).setColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f})
+				);
+
+				String printText = Float.toString(lastQuaternionSensor1[0]) + " , " + Float.toString(lastQuaternionSensor1[1]) + " , " + Float.toString(lastQuaternionSensor1[2]) + " , " + Float.toString(lastQuaternionSensor1[3]) + " , ";
+				printText += Float.toString(lastQuaternionSensor2[0]) + " , " + Float.toString(lastQuaternionSensor2[1]) + " , " + Float.toString(lastQuaternionSensor2[2]) + " , " + Float.toString(lastQuaternionSensor2[3]);
+				Log.i("CombinedSensors", printText);
+
+				lastTimestampSensor1 = Long.valueOf(0);
+				lastTimestampSensor2 = Long.valueOf(0);
+				lastTimestampSensor3 = Long.valueOf(0);
+				lastTimestampSensor4 = Long.valueOf(0);
+			}
+		}
 	}
 
 	@Override
@@ -425,6 +487,12 @@ public class ModelActivity extends Activity implements ServiceConnection {
 	{
 		if (sensor1 != null)
 			sensor1.stopStreams();
+		if (sensor2 != null)
+			sensor2.stopStreams();
+		if (sensor3 != null)
+			sensor3.stopStreams();
+		if (sensor4 != null)
+			sensor4.stopStreams();
 
 		if(logging != null){
 			logging.stop();
