@@ -11,6 +11,7 @@ import java.util.Random;
 import org.andresoviedo.app.model3D.SensorData;
 import org.andresoviedo.app.model3D.SensorDevice;
 import org.andresoviedo.app.model3D.model.Object3DBuilder;
+import org.andresoviedo.app.model3D.model.Object3DData;
 import org.andresoviedo.app.model3D.services.ExampleSceneLoader;
 import org.andresoviedo.app.model3D.services.SceneLoader;
 import org.andresoviedo.app.util.Utils;
@@ -451,6 +452,7 @@ public class ModelActivity extends Activity implements ServiceConnection {
 				//lastTimestampSensor3 != Long.valueOf(0) &&
 				//lastTimestampSensor4 != Long.valueOf(0))
 			{
+				//here hand is updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				scene.replaceObject(0,
 						Object3DBuilder.buildLine(
 								new float[]{
@@ -460,6 +462,13 @@ public class ModelActivity extends Activity implements ServiceConnection {
 						).setColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f})
 				);
 
+			//rotate cube only when receiving from one sensor
+			if(sensorName == LOG_TAG_SENSOR1) {
+				String cameraViewVal = "Front";
+				scene.replaceObject(1,
+						Object3DBuilder.buildCubeForSensor(3f, 2f, 1f, 0f, 0f, 0f, cameraViewVal, Quaternion)
+				);
+			}
 				String printText = Float.toString(lastQuaternionSensor1[0]) + " , " + Float.toString(lastQuaternionSensor1[1]) + " , " + Float.toString(lastQuaternionSensor1[2]) + " , " + Float.toString(lastQuaternionSensor1[3]) + " , ";
 				printText += Float.toString(lastQuaternionSensor2[0]) + " , " + Float.toString(lastQuaternionSensor2[1]) + " , " + Float.toString(lastQuaternionSensor2[2]) + " , " + Float.toString(lastQuaternionSensor2[3]);
 				Log.i("CombinedSensors", printText);

@@ -21,6 +21,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.microedition.khronos.opengles.GL;
+
 /**
  * This class loads a 3D scene as an example of what can be done with the app
  *
@@ -68,17 +70,45 @@ public class ExampleSceneLoader extends SceneLoader {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
+
 					if(overwriteBodyRightHand == null){
 						bodyRightHand = Object3DBuilder.buildLine(
-							new float[] {
-								0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
-								0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
-							});
+								new float[] {
+										0.0f, 1.5f, 0.5f, 0.1f, 1.15f, 0.5f,
+										0.1f, 1.15f, 0.5f, 0.1f, 0.75f, 0.5f
+								});
 					} else {
 						bodyRightHand = Object3DBuilder.buildLine(overwriteBodyRightHand);
 					}
 					bodyRightHand.setColor(new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
 					addObject(bodyRightHand);
+
+
+
+
+String[] imageFilePaths = new String[] { "Form_3Dcuboid/Right.png", "Form_3Dcuboid/Left.png", "Form_3Dcuboid/Back.png", "Form_3Dcuboid/Front.png", "Form_3Dcuboid/Top.png", "Form_3Dcuboid/Bottom.png" };
+float[] dimensions = new float[] { 6, 4, 2 };
+String cameraView = "Front";
+float cameraDistance = 50.0f;
+boolean MinimizeInsteadOfClose = false;
+
+float[] transformationMatrix = new float[]
+		{1.0f, 0.0f, 0.0f, 0.0f,
+		 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.0f, 0.0f, 1.0f, 0.0f,
+		 0.0f, 0.0f, 0.0f, 1.0f};
+String[] imageFiles = imageFilePaths;
+float halfXdimension = dimensions[0] / 2;
+float halfYdimension = dimensions[1] / 2;
+float halfZdimension = dimensions[2] / 2;
+float shiftX = 0.0f;
+float shiftY = 0.0f;
+float shiftZ = 0.0f;
+float[] Quaternion = null;
+
+Object3DData testObject = Object3DBuilder.buildCubeForSensor(halfXdimension, halfYdimension, halfZdimension, shiftX, shiftY, shiftZ, cameraView, Quaternion);
+addObject(testObject);
+
 
 					Object3DData bodyLeftHand = Object3DBuilder.buildLine(
 						new float[] {

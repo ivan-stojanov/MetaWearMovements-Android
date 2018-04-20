@@ -85,9 +85,13 @@ public class Object3DData {
 	protected float[] position = new float[] { 0f, 0f, 0f };
 	protected float[] rotation = new float[] { 0f, 0f, 0f };
 	protected float[] scale = new float[] { 1, 1, 1 };
-	protected float[] modelMatrix = new float[16];
+	public float[] modelMatrix = new float[16];
 	{
 		Matrix.setIdentityM(modelMatrix,0);
+	}
+
+	public void setRotationMatrix(float[] matrix) {
+		this.modelMatrix = matrix;
 	}
 
 	// whether the object has changed
@@ -319,7 +323,7 @@ public class Object3DData {
 		Matrix.setIdentityM(modelMatrix,0);
 		Matrix.setRotateM(modelMatrix,0,getRotationX(),1,0,0);
 		Matrix.setRotateM(modelMatrix,0,getRotationY(),0,1,0);
-		Matrix.setRotateM(modelMatrix,0,getRotationY(),0,0,1);
+		Matrix.setRotateM(modelMatrix,0,getRotationZ(),0,0,1);
 		Matrix.scaleM(modelMatrix,0,getScaleX(),getScaleY(),getScaleZ());
 		Matrix.translateM(modelMatrix,0,getPositionX(),getPositionY(),getPositionZ());
 	}

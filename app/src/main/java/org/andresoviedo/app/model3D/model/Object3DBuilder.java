@@ -3,6 +3,7 @@ package org.andresoviedo.app.model3D.model;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import org.andresoviedo.app.model3D.services.WavefrontLoader;
@@ -30,6 +31,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public final class Object3DBuilder {
 
@@ -47,6 +49,13 @@ public final class Object3DBuilder {
 	 * Default vertices colors
 	 */
 	private static float[] DEFAULT_COLOR = {1.0f, 1.0f, 0, 1.0f};
+	public static float halfXdimension = 1.0f;
+	public static float halfYdimension = 1.0f;
+	public static float halfZdimension = 1.0f;
+	public static float shiftX = 0.0f;
+	public static float shiftY = 0.0f;
+	public static float shiftZ = 0.0f;
+	public static String cameraView = "Front";
 
 	final static float[] axisVertexLinesData = new float[]{
 			//@formatter:off
@@ -156,6 +165,64 @@ public final class Object3DBuilder {
 			-1.0f, -1.0f, -1.0f
 	};
 
+	final static float[] cubePositionDataForSensor = {
+// Front face // +'ve z face
+// Right face // +'ve x face
+// Back face // -'ve z face
+// Left face // -'ve x face
+// Top face // +'ve y face
+// Bottom face // -'ve y face
+// 2i4 3i6
+			//@formatter:off
+			// Front face // +'ve z face
+			-halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+
+			// Right face // +'ve x face
+			halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+
+			// Back face // -'ve z face
+			halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+
+			// Left face // -'ve x face
+			-halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+
+			// Top face // +'ve y face
+			-halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+			-halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, halfZdimension + shiftZ,
+			halfXdimension + shiftX, halfYdimension + shiftY, -halfZdimension + shiftZ,
+
+			// Bottom face // -'ve y face
+			halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ,
+			halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, halfZdimension + shiftZ,
+			-halfXdimension + shiftX, -halfYdimension + shiftY, -halfZdimension + shiftZ
+	};
+
 	final static float[] cubeColorData = {
 
 			// Front face (red)
@@ -207,9 +274,213 @@ public final class Object3DBuilder {
 			1.0f, 0.0f, 1.0f, 1.0f
 	};
 
+	final static float[] cubeColorDataRed = {
+
+			// Front face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+
+			// Right face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+
+			// Back face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+
+			// Left face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+
+			// Top face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+
+			// Bottom face (red)
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	final static float[] cubeColorDataGreen = {
+
+			// Front face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+
+			// Right face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+
+			// Back face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+
+			// Left face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+
+			// Top face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+
+			// Bottom face (green)
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 1.0f
+	};
+
+	final static float[] cubeColorDataBlue = {
+
+			// Front face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+
+			// Right face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+
+			// Back face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+
+			// Left face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+
+			// Top face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+
+			// Bottom face (blue)
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+	};
+
+	final static float[] cubeColorDataYellow = {
+
+			// Front face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+
+			// Right face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+
+			// Back face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+
+			// Left face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+
+			// Top face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+
+			// Bottom face (yellow)
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f
+	};
+
 	final static float[] cubeNormalData =
 			{
-					// Front face
+					// Front face // +'ve z face
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
@@ -217,7 +488,7 @@ public final class Object3DBuilder {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 
-					// Right face
+					// Right face // +'ve y face
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
@@ -225,7 +496,7 @@ public final class Object3DBuilder {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 
-					// Back face
+					// Back face // -'ve z face
 					0.0f, 0.0f, -1.0f,
 					0.0f, 0.0f, -1.0f,
 					0.0f, 0.0f, -1.0f,
@@ -233,7 +504,7 @@ public final class Object3DBuilder {
 					0.0f, 0.0f, -1.0f,
 					0.0f, 0.0f, -1.0f,
 
-					// Left face
+					// Left face // -'ve x face
 					-1.0f, 0.0f, 0.0f,
 					-1.0f, 0.0f, 0.0f,
 					-1.0f, 0.0f, 0.0f,
@@ -241,7 +512,7 @@ public final class Object3DBuilder {
 					-1.0f, 0.0f, 0.0f,
 					-1.0f, 0.0f, 0.0f,
 
-					// Top face
+					// Top face // +'ve y face
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
@@ -249,7 +520,7 @@ public final class Object3DBuilder {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 
-					// Bottom face
+					// Bottom face // -'ve y face
 					0.0f, -1.0f, 0.0f,
 					0.0f, -1.0f, 0.0f,
 					0.0f, -1.0f, 0.0f,
@@ -261,7 +532,7 @@ public final class Object3DBuilder {
 
 	final static float[] cubeTextureCoordinateData =
 			{
-					// Front face
+					// Front face // +'ve z face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -269,7 +540,7 @@ public final class Object3DBuilder {
 					1.0f, 1.0f,
 					1.0f, 0.0f,
 
-					// Right face
+					// Right face // +'ve y face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -277,7 +548,7 @@ public final class Object3DBuilder {
 					1.0f, 1.0f,
 					1.0f, 0.0f,
 
-					// Back face
+					// Back face // -'ve z face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -285,7 +556,7 @@ public final class Object3DBuilder {
 					1.0f, 1.0f,
 					1.0f, 0.0f,
 
-					// Left face
+					// Left face // -'ve x face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -293,7 +564,7 @@ public final class Object3DBuilder {
 					1.0f, 1.0f,
 					1.0f, 0.0f,
 
-					// Top face
+					// Top face // +'ve y face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -301,7 +572,7 @@ public final class Object3DBuilder {
 					1.0f, 1.0f,
 					1.0f, 0.0f,
 
-					// Bottom face
+					// Bottom face // -'ve y face
 					0.0f, 0.0f,
 					0.0f, 1.0f,
 					1.0f, 0.0f,
@@ -342,6 +613,124 @@ public final class Object3DBuilder {
 		return new Object3DData(
 				createNativeByteBuffer(axisVertexLinesData.length * 4).asFloatBuffer().put(axisVertexLinesData))
 				.setDrawMode(GLES20.GL_LINES).setFaces(new Faces(0));
+	}
+
+	public static Object3DData buildCubeForSensor(float halfXdimensionVAL, float halfYdimensionVAL, float halfZdimensionVAL, float shiftXVAL, float shiftYVAL, float shiftZVAL, String cameraViewVAL, float[] QuaternionVAL) {
+		halfXdimension = halfXdimensionVAL;
+		halfXdimension = halfYdimensionVAL;
+		halfXdimension = halfZdimensionVAL;
+		shiftX = shiftXVAL;
+		shiftY = shiftYVAL;
+		shiftZ = shiftZVAL;
+		cameraView = cameraViewVAL;
+
+		float [] cubeColorDataVal = cubeColorData;
+/*		float [] rotationVal = new float[] { 0f, 0f, 0f };
+		float randomFloat = (new Random()).nextFloat();
+		if (randomFloat > 0.2f && randomFloat <= 0.4f){
+			cubeColorDataVal = cubeColorDataRed;
+			rotationVal = new float[] { 30f, 0f, 0f };
+		}
+		else if (randomFloat > 0.4f && randomFloat <= 0.6f){
+			cubeColorDataVal = cubeColorDataGreen;
+			rotationVal = new float[] { 45f, 0f, 0f };
+		}
+		else if (randomFloat > 0.6f && randomFloat <= 0.8f){
+			cubeColorDataVal = cubeColorDataBlue;
+			rotationVal = new float[] { 60f, 0f, 0f };
+		}
+		else if (randomFloat > 0.8f && randomFloat <= 1.0f){
+			cubeColorDataVal = cubeColorDataYellow;
+			rotationVal = new float[] { 75f, 0f, 0f };
+		}
+*/
+		Object3DData resultObject3DData = new Object3DData(
+				createNativeByteBuffer(cubePositionDataForSensor.length * 4).asFloatBuffer().put(cubePositionDataForSensor))
+				.setVertexColorsArrayBuffer(
+				createNativeByteBuffer(cubeColorDataVal.length * 4).asFloatBuffer().put(cubeColorDataVal))
+				.setVertexNormalsArrayBuffer(
+						createNativeByteBuffer(cubeNormalData.length * 4).asFloatBuffer().put(cubeNormalData))
+				.setDrawMode(GLES20.GL_TRIANGLES).setId("cubeV1ForSensor").centerAndScale(1.0f).setFaces(new Faces(8));
+
+		if (cameraView == "Right")
+		{
+			resultObject3DData.setRotation(new float[] { 0f, -90f, 0f });
+			resultObject3DData.setRotation(new float[] { -90f, 0f, 0f });
+		}
+		else if (cameraView == "Left")
+		{
+			resultObject3DData.setRotation(new float[] { 0f, 90f, 0f });
+			resultObject3DData.setRotation(new float[] { -90f, 0f, 0f });
+		}
+		else if (cameraView == "Back")
+		{
+			resultObject3DData.setRotation(new float[] { 90f, 0f, 0f });
+			resultObject3DData.setRotation(new float[] { 0f, 180f, 0f });
+		}
+		else if (cameraView == "Front")
+		{
+			resultObject3DData.setRotation(new float[] { -90f, 0f, 0f });
+		}
+		else if (cameraView == "Top")
+		{
+
+		}
+		else if (cameraView == "Bottom")
+		{
+			resultObject3DData.setRotation(new float[] { 180f, 0f, 0f });
+		}
+
+Log.i("testDebugIvan", "Object3DBuilder.java - line 683");
+if(QuaternionVAL != null)
+	Log.i("testDebugIvan", "QuaternionVAL.length = " + Integer.toString(QuaternionVAL.length));
+else
+	Log.i("testDebugIvan", "is null ");
+
+		if(QuaternionVAL != null && QuaternionVAL.length == 4)
+		{
+Log.i("testDebugIvan", "Object3DBuilder.java - line 691");
+			float num = (float) Math.sqrt((double) QuaternionVAL[0] * (double) QuaternionVAL[0] + (double) QuaternionVAL[1] * (double) QuaternionVAL[1] + (double) QuaternionVAL[2] * (double) QuaternionVAL[2] + (double) QuaternionVAL[3] * (double) QuaternionVAL[3]);
+			QuaternionVAL[0] /= num;
+			QuaternionVAL[1] /= num;
+			QuaternionVAL[2] /= num;
+			QuaternionVAL[3] /= num;
+
+			float modelMatrix00 = (float) (2.0 * (double) QuaternionVAL[0] * (double) QuaternionVAL[0] - 1.0 + 2.0 * (double) QuaternionVAL[1] * (double) QuaternionVAL[1]);
+			float modelMatrix01 = (float) (2.0 * ((double) QuaternionVAL[1] * (double) QuaternionVAL[2] + (double) QuaternionVAL[0] * (double) QuaternionVAL[3]));
+			float modelMatrix02 = (float) (2.0 * ((double) QuaternionVAL[1] * (double) QuaternionVAL[3] - (double) QuaternionVAL[0] * (double) QuaternionVAL[2]));
+			float modelMatrix10 = (float) (2.0 * ((double) QuaternionVAL[1] * (double) QuaternionVAL[2] - (double) QuaternionVAL[0] * (double) QuaternionVAL[3]));
+			float modelMatrix11 = (float) (2.0 * (double) QuaternionVAL[0] * (double) QuaternionVAL[0] - 1.0 + 2.0 * (double) QuaternionVAL[2] * (double) QuaternionVAL[2]);
+			float modelMatrix12 = (float) (2.0 * ((double) QuaternionVAL[2] * (double) QuaternionVAL[3] + (double) QuaternionVAL[0] * (double) QuaternionVAL[1]));
+			float modelMatrix20 = (float) (2.0 * ((double) QuaternionVAL[1] * (double) QuaternionVAL[3] + (double) QuaternionVAL[0] * (double) QuaternionVAL[2]));
+			float modelMatrix21 = (float) (2.0 * ((double) QuaternionVAL[2] * (double) QuaternionVAL[3] - (double) QuaternionVAL[0] * (double) QuaternionVAL[1]));
+			float modelMatrix22 = (float) (2.0 * (double) QuaternionVAL[0] * (double) QuaternionVAL[0] - 1.0 + 2.0 * (double) QuaternionVAL[3] * (double) QuaternionVAL[3]);
+
+			/*float[] modelMatrix = new float[16];
+			Matrix.setIdentityM(modelMatrix,0);
+			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationX(),modelMatrix00,modelMatrix01,modelMatrix02);
+			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationY(),modelMatrix10,modelMatrix11,modelMatrix12);
+			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationZ(),modelMatrix20,modelMatrix21,modelMatrix22);
+			resultObject3DData.setRotationMatrix(modelMatrix);*/
+			resultObject3DData.setRotation(new float[] { modelMatrix00, modelMatrix01, modelMatrix02 });
+			resultObject3DData.setRotation(new float[] { modelMatrix10, modelMatrix11, modelMatrix12 });
+			resultObject3DData.setRotation(new float[] { modelMatrix20, modelMatrix21, modelMatrix22 });
+Log.i("testDebugIvan", "modelMatrix00 = " + Float.toString(modelMatrix00));
+Log.i("testDebugIvan", "modelMatrix01 = " + Float.toString(modelMatrix01));
+Log.i("testDebugIvan", "modelMatrix02 = " + Float.toString(modelMatrix02));
+Log.i("testDebugIvan", "modelMatrix10 = " + Float.toString(modelMatrix10));
+Log.i("testDebugIvan", "modelMatrix11 = " + Float.toString(modelMatrix11));
+Log.i("testDebugIvan", "modelMatrix12 = " + Float.toString(modelMatrix12));
+Log.i("testDebugIvan", "modelMatrix20 = " + Float.toString(modelMatrix20));
+Log.i("testDebugIvan", "modelMatrix21 = " + Float.toString(modelMatrix21));
+Log.i("testDebugIvan", "modelMatrix22 = " + Float.toString(modelMatrix22));
+		}
+		//Matrix.scaleM(modelMatrix,0,resultObject3DData.getScaleX(),resultObject3DData.getScaleY(),resultObject3DData.getScaleZ());
+		//Matrix.translateM(modelMatrix,0,resultObject3DData.getPositionX(),resultObject3DData.getPositionY(),resultObject3DData.getPositionZ());
+
+
+
+
+		return resultObject3DData;
 	}
 
 	public static Object3DData buildCubeV1() {
