@@ -652,7 +652,7 @@ public final class Object3DBuilder {
 						createNativeByteBuffer(cubeNormalData.length * 4).asFloatBuffer().put(cubeNormalData))
 				.setDrawMode(GLES20.GL_TRIANGLES).setId("cubeV1ForSensor").centerAndScale(1.0f).setFaces(new Faces(8));
 
-		if (cameraView == "Right")
+		/*if (cameraView == "Right")
 		{
 			resultObject3DData.setRotation(new float[] { 0f, -90f, 0f });
 			resultObject3DData.setRotation(new float[] { -90f, 0f, 0f });
@@ -678,7 +678,7 @@ public final class Object3DBuilder {
 		else if (cameraView == "Bottom")
 		{
 			resultObject3DData.setRotation(new float[] { 180f, 0f, 0f });
-		}
+		}*/
 
 Log.i("testDebugIvan", "Object3DBuilder.java - line 683");
 if(QuaternionVAL != null)
@@ -689,6 +689,45 @@ else
 		if(QuaternionVAL != null && QuaternionVAL.length == 4)
 		{
 Log.i("testDebugIvan", "Object3DBuilder.java - line 691");
+/*
+			float num = (float) Math.sqrt((double) QuaternionVAL[0] * (double) QuaternionVAL[0] + (double) QuaternionVAL[1] * (double) QuaternionVAL[1] + (double) QuaternionVAL[2] * (double) QuaternionVAL[2] + (double) QuaternionVAL[3] * (double) QuaternionVAL[3]);
+			QuaternionVAL[0] /= num;
+			QuaternionVAL[1] /= num;
+			QuaternionVAL[2] /= num;
+			QuaternionVAL[3] /= num;
+*/
+			double R11 = 2.*QuaternionVAL[0]*QuaternionVAL[0] -1 +2.*QuaternionVAL[1]*QuaternionVAL[1];
+			double R21 = 2.*(QuaternionVAL[1]*QuaternionVAL[2] - QuaternionVAL[0]*QuaternionVAL[3]);
+			double R31 = 2.*(QuaternionVAL[1]*QuaternionVAL[3] + QuaternionVAL[0]*QuaternionVAL[2]);
+			double R32 = 2.*(QuaternionVAL[2]*QuaternionVAL[3] - QuaternionVAL[0]*QuaternionVAL[1]);
+			double R33 = 2.*QuaternionVAL[0]*QuaternionVAL[0] -1 +2.*QuaternionVAL[3]*QuaternionVAL[3];
+
+			double phi = Math.atan2(R32, R33 );
+			double theta = -Math.atan(R31 / Math.sqrt(1-R31*R31) );
+			double psi = Math.atan2(R21, R11 );
+
+			float phiAngle = (float)(phi*180./Math.PI);
+			float thetaAngle = (float)(theta*180./Math.PI);
+			float psiAngle = (float)(psi*180./Math.PI);
+
+Log.i("debug angles phi = ", Double.toString(phi));
+Log.i("debug angles theta = ", Double.toString(theta));
+Log.i("debug angles psi = ", Double.toString(psi));
+			resultObject3DData.setRotation(new float[] { 0f, 0f, psiAngle });
+			resultObject3DData.setRotation(new float[] { 0f, thetaAngle, 0f });
+			resultObject3DData.setRotation(new float[] { phiAngle * (-1.0f), 0f, 0f });
+
+			/*https://bitbucket.org/cinqlair/mpu9250/src/0b38d94e630291eeff31fb0c1897425f64cb0c31/mpu9250_OpenGL/src/objectgl.cpp?at=master&fileviewer=file-view-default
+			glRotated(angle_z , 0.0, 0.0, 1.0);
+			glRotated(angle_y, 0.0, 1.0, 0.0);
+			glRotated(-angle_x, 1.0, 0.0, 0.0);*/
+
+			//resultObject3DData.setRotation(new float[] { (float)(phi*180./Math.PI) , (float)(theta*180./Math.PI) , (float)(psi*180./Math.PI) });
+
+Log.i("testDebugIvan", "phi = " + Double.toString(phi) + " , " + Double.toString(phi*180./Math.PI));
+Log.i("testDebugIvan", "theta = " + Double.toString(theta) + " , " + Double.toString(theta*180./Math.PI));
+Log.i("testDebugIvan", "psi = " + Double.toString(psi) + " , " + Double.toString(psi*180./Math.PI));
+/*
 			float num = (float) Math.sqrt((double) QuaternionVAL[0] * (double) QuaternionVAL[0] + (double) QuaternionVAL[1] * (double) QuaternionVAL[1] + (double) QuaternionVAL[2] * (double) QuaternionVAL[2] + (double) QuaternionVAL[3] * (double) QuaternionVAL[3]);
 			QuaternionVAL[0] /= num;
 			QuaternionVAL[1] /= num;
@@ -705,15 +744,16 @@ Log.i("testDebugIvan", "Object3DBuilder.java - line 691");
 			float modelMatrix21 = (float) (2.0 * ((double) QuaternionVAL[2] * (double) QuaternionVAL[3] - (double) QuaternionVAL[0] * (double) QuaternionVAL[1]));
 			float modelMatrix22 = (float) (2.0 * (double) QuaternionVAL[0] * (double) QuaternionVAL[0] - 1.0 + 2.0 * (double) QuaternionVAL[3] * (double) QuaternionVAL[3]);
 
-			/*float[] modelMatrix = new float[16];
+			float[] modelMatrix = new float[16];
 			Matrix.setIdentityM(modelMatrix,0);
 			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationX(),modelMatrix00,modelMatrix01,modelMatrix02);
 			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationY(),modelMatrix10,modelMatrix11,modelMatrix12);
 			Matrix.setRotateM(modelMatrix,0,resultObject3DData.getRotationZ(),modelMatrix20,modelMatrix21,modelMatrix22);
-			resultObject3DData.setRotationMatrix(modelMatrix);*/
+			resultObject3DData.setRotationMatrix(modelMatrix);
 			resultObject3DData.setRotation(new float[] { modelMatrix00, modelMatrix01, modelMatrix02 });
 			resultObject3DData.setRotation(new float[] { modelMatrix10, modelMatrix11, modelMatrix12 });
 			resultObject3DData.setRotation(new float[] { modelMatrix20, modelMatrix21, modelMatrix22 });
+
 Log.i("testDebugIvan", "modelMatrix00 = " + Float.toString(modelMatrix00));
 Log.i("testDebugIvan", "modelMatrix01 = " + Float.toString(modelMatrix01));
 Log.i("testDebugIvan", "modelMatrix02 = " + Float.toString(modelMatrix02));
@@ -723,6 +763,7 @@ Log.i("testDebugIvan", "modelMatrix12 = " + Float.toString(modelMatrix12));
 Log.i("testDebugIvan", "modelMatrix20 = " + Float.toString(modelMatrix20));
 Log.i("testDebugIvan", "modelMatrix21 = " + Float.toString(modelMatrix21));
 Log.i("testDebugIvan", "modelMatrix22 = " + Float.toString(modelMatrix22));
+*/
 		}
 		//Matrix.scaleM(modelMatrix,0,resultObject3DData.getScaleX(),resultObject3DData.getScaleY(),resultObject3DData.getScaleZ());
 		//Matrix.translateM(modelMatrix,0,resultObject3DData.getPositionX(),resultObject3DData.getPositionY(),resultObject3DData.getPositionZ());
