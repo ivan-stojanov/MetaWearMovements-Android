@@ -1,4 +1,0 @@
-#Tue Apr 24 18:41:47 CEST 2018
-base.0=D\:\\Knigi za Fax\\Postdiplomski\\Web-Orientirano Softversko Inzinjerstvo\\AndroidApp\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\6
-path.0=classes.dex
-renamed.0=classes.dex
